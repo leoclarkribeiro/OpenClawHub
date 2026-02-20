@@ -165,9 +165,102 @@
     footer a:hover {
       color: var(--accent);
     }
+
+    .menu-trigger {
+      position: fixed;
+      top: 1rem;
+      left: 1rem;
+      z-index: 100;
+      background: var(--bg-card);
+      border: 1px solid rgba(255, 90, 45, 0.2);
+      border-radius: 8px;
+      padding: 0.5rem 0.75rem;
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 0.875rem;
+      color: var(--accent);
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      transition: border-color 0.2s, background 0.2s;
+    }
+
+    .menu-trigger:hover {
+      border-color: var(--accent-dim);
+      background: rgba(255, 90, 45, 0.08);
+    }
+
+    .menu-panel {
+      position: fixed;
+      top: 3.25rem;
+      left: 1rem;
+      z-index: 99;
+      background: var(--bg-card);
+      border: 1px solid rgba(255, 90, 45, 0.2);
+      border-radius: 12px;
+      padding: 0.75rem 0;
+      min-width: 280px;
+      box-shadow: 0 8px 32px rgba(0, 0, 0, 0.4);
+      display: none;
+    }
+
+    .menu-panel.open {
+      display: block;
+    }
+
+    .menu-panel a,
+    .menu-panel span {
+      display: block;
+      padding: 0.5rem 1rem;
+      font-size: 0.9375rem;
+      color: var(--text-muted);
+      text-decoration: none;
+      cursor: default;
+      transition: color 0.15s, background 0.15s;
+    }
+
+    .menu-panel a:hover,
+    .menu-panel span:hover {
+      color: var(--text);
+      background: rgba(255, 90, 45, 0.06);
+    }
+
+    .menu-panel .soon {
+      font-size: 0.75rem;
+      color: var(--muted);
+      margin-left: 0.25rem;
+    }
+
+    .menu-overlay {
+      position: fixed;
+      inset: 0;
+      z-index: 98;
+      background: transparent;
+      display: none;
+    }
+
+    .menu-overlay.open {
+      display: block;
+    }
   </style>
 </head>
 <body>
+  <button class="menu-trigger" type="button" aria-expanded="false" aria-controls="menu-panel" id="menu-trigger">
+    <span aria-hidden="true">☰</span> Menu
+  </button>
+  <div class="menu-overlay" id="menu-overlay" aria-hidden="true"></div>
+  <nav class="menu-panel" id="menu-panel" role="menu" aria-label="Main navigation">
+    <span>Create / Join your local community <span class="soon">(soon)</span></span>
+    <span>Ask for help! <span class="soon">(soon)</span></span>
+    <span>Offer your services <span class="soon">(soon)</span></span>
+    <span>Post a bounty, ask for a specific skill <span class="soon">(soon)</span></span>
+    <span>Weekly Challenges <span class="soon">(soon)</span></span>
+    <span>Show your creations <span class="soon">(soon)</span></span>
+    <span>Browse the OpenClaw Hub map <span class="soon">(soon)</span></span>
+    <span>Events calendar <span class="soon">(soon)</span></span>
+    <span>Post a meme <span class="soon">(soon)</span></span>
+  </nav>
+
   <div class="container">
     <header>
       <div class="logo">🦞</div>
@@ -197,7 +290,7 @@
       <h2 class="section-label">What is OpenClaw Hub?</h2>
       <div class="card">
         <p class="hub-intro">
-          <strong>OpenClaw Hub</strong> is where human lobsters connect, share experiences, get help and explore the future of personal AI assistants. Plus, organize and join local meetups. Check our map feature.
+          <strong>OpenClaw Hub</strong> is where human lobsters connect, share experiences, get help and explore the future of personal AI assistants. Plus, organize and join local meetups. Check our map feature (soon).
         </p>
       </div>
     </section>
@@ -207,5 +300,29 @@
       <p style="margin-top: 0.5rem;"><a href="https://openclaw.ai/" target="_blank" rel="noopener noreferrer">openclaw.ai</a></p>
     </footer>
   </div>
+
+  <script>
+    (function() {
+      var trigger = document.getElementById('menu-trigger');
+      var panel = document.getElementById('menu-panel');
+      var overlay = document.getElementById('menu-overlay');
+
+      function toggleMenu() {
+        var isOpen = panel.classList.contains('open');
+        panel.classList.toggle('open', !isOpen);
+        overlay.classList.toggle('open', !isOpen);
+        trigger.setAttribute('aria-expanded', !isOpen);
+      }
+
+      function closeMenu() {
+        panel.classList.remove('open');
+        overlay.classList.remove('open');
+        trigger.setAttribute('aria-expanded', 'false');
+      }
+
+      trigger.addEventListener('click', toggleMenu);
+      overlay.addEventListener('click', closeMenu);
+    })();
+  </script>
 </body>
 </html>
