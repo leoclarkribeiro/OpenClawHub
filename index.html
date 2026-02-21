@@ -168,20 +168,20 @@
 
     .menu-trigger {
       position: fixed;
-      top: 1rem;
-      left: 1rem;
+      top: 0.75rem;
+      left: 0.75rem;
       z-index: 100;
       background: var(--bg-card);
       border: 1px solid rgba(255, 90, 45, 0.2);
-      border-radius: 8px;
-      padding: 0.5rem 0.75rem;
+      border-radius: 6px;
+      padding: 0.35rem 0.6rem;
       font-family: 'JetBrains Mono', monospace;
-      font-size: 0.875rem;
+      font-size: 0.8rem;
       color: var(--accent);
       cursor: pointer;
       display: flex;
       align-items: center;
-      gap: 0.5rem;
+      gap: 0.4rem;
       transition: border-color 0.2s, background 0.2s;
     }
 
@@ -192,14 +192,14 @@
 
     .menu-panel {
       position: fixed;
-      top: 3.25rem;
+      top: 2.5rem;
       left: 1rem;
       z-index: 99;
       background: var(--bg-card);
       border: 1px solid rgba(255, 90, 45, 0.2);
-      border-radius: 12px;
-      padding: 0.75rem 0;
-      min-width: 280px;
+      border-radius: 10px;
+      padding: 0.35rem 0;
+      min-width: 240px;
       box-shadow: 0 8px 32px rgba(0, 0, 0, 0.4);
       display: none;
     }
@@ -210,9 +210,12 @@
 
     .menu-panel a,
     .menu-panel span {
-      display: block;
-      padding: 0.5rem 1rem;
-      font-size: 0.9375rem;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 0.35rem;
+      padding: 0.3rem 0.6rem;
+      font-size: 0.8rem;
       color: var(--text-muted);
       text-decoration: none;
       cursor: default;
@@ -225,10 +228,16 @@
       background: rgba(255, 90, 45, 0.06);
     }
 
+    .menu-panel .menu-item-text {
+      flex: 1;
+      min-width: 0;
+    }
+
     .menu-panel .soon {
-      font-size: 0.75rem;
+      font-size: 0.7rem;
       color: var(--muted);
-      margin-left: 0.25rem;
+      flex-shrink: 0;
+      white-space: nowrap;
     }
 
     .menu-overlay {
@@ -250,15 +259,15 @@
   </button>
   <div class="menu-overlay" id="menu-overlay" aria-hidden="true"></div>
   <nav class="menu-panel" id="menu-panel" role="menu" aria-label="Main navigation">
-    <span>Create / Join your local community <span class="soon">(soon)</span></span>
-    <span>Ask for help! <span class="soon">(soon)</span></span>
-    <span>Offer your services <span class="soon">(soon)</span></span>
-    <span>Post a bounty, ask for a specific skill <span class="soon">(soon)</span></span>
-    <span>Weekly Challenges <span class="soon">(soon)</span></span>
-    <span>Show your creations <span class="soon">(soon)</span></span>
-    <span>Browse the OpenClaw Hub map <span class="soon">(soon)</span></span>
-    <span>Events calendar <span class="soon">(soon)</span></span>
-    <span>Post a meme <span class="soon">(soon)</span></span>
+    <span><span class="menu-item-text">Create / Join your local community</span><span class="soon">(soon)</span></span>
+    <span><span class="menu-item-text">Ask for help!</span><span class="soon">(soon)</span></span>
+    <span><span class="menu-item-text">Offer your services</span><span class="soon">(soon)</span></span>
+    <span><span class="menu-item-text">Post a bounty, ask for a specific skill</span><span class="soon">(soon)</span></span>
+    <span><span class="menu-item-text">Weekly Challenges</span><span class="soon">(soon)</span></span>
+    <span><span class="menu-item-text">Show your creations</span><span class="soon">(soon)</span></span>
+    <span><span class="menu-item-text">Browse the OpenClaw Hub map</span><span class="soon">(soon)</span></span>
+    <span><span class="menu-item-text">Events calendar</span><span class="soon">(soon)</span></span>
+    <span><span class="menu-item-text">Post a meme</span><span class="soon">(soon)</span></span>
   </nav>
 
   <div class="container">
