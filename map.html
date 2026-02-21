@@ -87,6 +87,7 @@
       right: 0;
       bottom: 0;
       z-index: 1;
+      cursor: pointer;
     }
     .leaflet-popup-content-wrapper {
       background: var(--bg-card);
@@ -118,7 +119,7 @@
       flex-wrap: wrap;
     }
     .filter-btn {
-      font-size: 0.75rem;
+      font-size: 0.7rem;
       padding: 0.3rem 0.5rem;
       border-radius: 4px;
       border: 1px solid rgba(139, 127, 119, 0.3);
@@ -216,8 +217,8 @@
   <aside class="sidebar">
     <div class="filter-row">
       <button type="button" class="filter-btn active" data-filter="all">All</button>
-      <button type="button" class="filter-btn" data-filter="lobster">🦞 Lobster</button>
-      <button type="button" class="filter-btn" data-filter="meetup">🏠 Meetup</button>
+      <button type="button" class="filter-btn" data-filter="lobster">🦞 Human Lobster / Builder</button>
+      <button type="button" class="filter-btn" data-filter="meetup">🏠 Meetup & IRL Event</button>
       <button type="button" class="filter-btn" data-filter="business">💰 Business</button>
     </div>
     <div id="spot-list"></div>
@@ -271,15 +272,8 @@
           <label>Image URL (optional)</label>
           <input type="url" id="spot-image" placeholder="https://...">
         </div>
-        <div class="form-group">
-          <label>Latitude *</label>
-          <input type="number" step="any" id="spot-lat" required placeholder="e.g. 40.7128">
-        </div>
-        <div class="form-group">
-          <label>Longitude *</label>
-          <input type="number" step="any" id="spot-lng" required placeholder="e.g. -74.0060">
-          <small style="color:var(--muted);font-size:0.75rem">Tip: <a href="https://www.latlong.net/" target="_blank" rel="noopener">latlong.net</a> or right-click on Google Maps</small>
-        </div>
+        <input type="hidden" id="spot-lat">
+        <input type="hidden" id="spot-lng">
         <div class="form-actions">
           <button type="button" class="btn" id="btn-cancel">Cancel</button>
           <button type="submit" class="btn btn-primary">Save</button>

@@ -21,6 +21,18 @@
     attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a>'
   }).addTo(map);
 
+  // Map click: add spot (signed in) or prompt sign in (signed out)
+  map.on('click', async (e) => {
+    if (e.originalEvent.target.closest('.leaflet-marker-icon, .leaflet-popup, .leaflet-popup-content')) return;
+    if (currentUser) {
+      const { lat, lng } = e.latlng;
+      const city = await reverseGeocode(lat, lng);
+      openSpotModal(null, { lat, lng, city });
+    } else {
+      document.getElementById('auth-modal').classList.add('open');
+    }
+  });
+
   // Auth
   supabase.auth.getSession().then(({ data: { session } }) => {
     currentUser = session?.user ?? null;
@@ -174,6 +186,20 @@
     return div.innerHTML;
   }
 
+  async function reverseGeocode(lat, lng) {
+    try {
+      const res = await fetch(
+        `https://nominatim.openstreetmap.org/reverse?lat=${lat}&lon=${lng}&format=json`,
+        { headers: { 'User-Agent': 'OpenClawHub/1.0' } }
+      );
+      const data = await res.json();
+      const a = data?.address || {};
+      return a.city || a.town || a.village || a.municipality || a.county || a.state || data?.display_name?.split(',')[0] || '';
+    } catch (_) {
+      return '';
+    }
+  }
+
   // Filter
   document.querySelectorAll('.filter-btn').forEach(btn => {
     btn.addEventListener('click', () => {
@@ -185,23 +211,31 @@
     });
   });
 
-  // Add spot modal
+  // Add spot button: focus map, show hint
   document.getElementById('btn-add').addEventListener('click', () => {
-    if (!currentUser) return;
-    openSpotModal();
+    if (!currentUser) {
+      document.getElementById('auth-modal').classList.add('open');
+      return;
+    }
+    const hint = document.createElement('div');
+    hint.id = 'add-hint';
+    hint.style.cssText = 'position:fixed;bottom:1rem;left:50%;transform:translateX(-50%);background:var(--bg-card);border:1px solid rgba(255,90,45,0.3);padding:0.5rem 1rem;border-radius:8px;font-size:0.85rem;z-index:1500';
+    hint.textContent = 'Click on the map to add a spot';
+    document.body.appendChild(hint);
+    setTimeout(() => hint.remove(), 3000);
   });
 
-  function openSpotModal(spot) {
+  function openSpotModal(spot, fromClick) {
     const modal = document.getElementById('spot-modal');
     document.getElementById('spot-modal-title').textContent = spot ? 'Edit spot' : 'Add spot';
     document.getElementById('spot-id').value = spot?.id || '';
     document.getElementById('spot-name').value = spot?.name || '';
     document.getElementById('spot-description').value = spot?.description || '';
-    document.getElementById('spot-city').value = spot?.city || '';
+    document.getElementById('spot-city').value = (fromClick?.city ?? spot?.city) || '';
     document.getElementById('spot-category').value = spot?.category || 'lobster';
     document.getElementById('spot-image').value = spot?.image_url || '';
-    document.getElementById('spot-lat').value = spot?.lat ?? '';
-    document.getElementById('spot-lng').value = spot?.lng ?? '';
+    document.getElementById('spot-lat').value = fromClick?.lat ?? spot?.lat ?? '';
+    document.getElementById('spot-lng').value = fromClick?.lng ?? spot?.lng ?? '';
     modal.classList.add('open');
   }
 
@@ -216,14 +250,20 @@
   document.getElementById('spot-form').addEventListener('submit', async (e) => {
     e.preventDefault();
     const id = document.getElementById('spot-id').value;
+    const lat = parseFloat(document.getElementById('spot-lat').value);
+    const lng = parseFloat(document.getElementById('spot-lng').value);
+    if (isNaN(lat) || isNaN(lng)) {
+      alert('Please click on the map to choose a location.');
+      return;
+    }
     const payload = {
       name: document.getElementById('spot-name').value.trim(),
       description: document.getElementById('spot-description').value.trim() || null,
       city: document.getElementById('spot-city').value.trim(),
       category: document.getElementById('spot-category').value,
       image_url: document.getElementById('spot-image').value.trim() || null,
-      lat: parseFloat(document.getElementById('spot-lat').value),
-      lng: parseFloat(document.getElementById('spot-lng').value)
+      lat,
+      lng
     };
     if (id) {
       const { error } = await supabase.from('spots').update(payload).eq('id', id).eq('created_by', currentUser.id);
