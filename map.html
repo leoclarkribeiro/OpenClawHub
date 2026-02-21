@@ -1,0 +1,296 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>OpenClaw Hub Map – Browse spots</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;600&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" crossorigin="">
+  <style>
+    :root {
+      --muted: #8B7F77;
+      --accent: #FF5A2D;
+      --accent-bright: #FF7A3D;
+      --accent-dim: #D14A22;
+      --success: #2FBF71;
+      --bg-dark: #0d0c0b;
+      --bg-card: #161412;
+      --text: #e8e4e0;
+      --text-muted: #8B7F77;
+    }
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body {
+      font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+      background: var(--bg-dark);
+      color: var(--text);
+      min-height: 100vh;
+    }
+    .map-header {
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      z-index: 1000;
+      background: var(--bg-card);
+      border-bottom: 1px solid rgba(255, 90, 45, 0.2);
+      padding: 0.6rem 1rem;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      flex-wrap: wrap;
+      gap: 0.5rem;
+    }
+    .map-header a {
+      color: var(--accent);
+      text-decoration: none;
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 0.85rem;
+    }
+    .map-header a:hover { color: var(--accent-bright); }
+    .map-header h1 {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 1rem;
+      font-weight: 600;
+    }
+    .map-header-actions {
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+    }
+    .btn {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 0.8rem;
+      padding: 0.4rem 0.75rem;
+      border-radius: 6px;
+      border: 1px solid rgba(255, 90, 45, 0.3);
+      background: rgba(255, 90, 45, 0.1);
+      color: var(--accent);
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+    .btn:hover {
+      background: rgba(255, 90, 45, 0.2);
+      border-color: var(--accent-dim);
+    }
+    .btn-primary {
+      background: var(--accent);
+      color: white;
+      border-color: var(--accent);
+    }
+    .btn-primary:hover { background: var(--accent-bright); }
+    #map {
+      position: fixed;
+      top: 52px;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      z-index: 1;
+    }
+    .leaflet-popup-content-wrapper {
+      background: var(--bg-card);
+      color: var(--text);
+      border: 1px solid rgba(255, 90, 45, 0.2);
+      border-radius: 8px;
+    }
+    .leaflet-popup-tip { background: var(--bg-card); }
+    .popup-content { min-width: 200px; }
+    .popup-content h3 { font-size: 0.95rem; margin-bottom: 0.25rem; }
+    .popup-content .category { font-size: 0.75rem; color: var(--muted); margin-bottom: 0.25rem; }
+    .popup-content .city { font-size: 0.8rem; color: var(--accent-dim); }
+    .sidebar {
+      position: fixed;
+      top: 52px;
+      right: 0;
+      width: 280px;
+      max-height: calc(100vh - 52px);
+      overflow-y: auto;
+      background: var(--bg-card);
+      border-left: 1px solid rgba(255, 90, 45, 0.2);
+      z-index: 500;
+      padding: 0.75rem;
+    }
+    .filter-row {
+      display: flex;
+      gap: 0.35rem;
+      margin-bottom: 0.75rem;
+      flex-wrap: wrap;
+    }
+    .filter-btn {
+      font-size: 0.75rem;
+      padding: 0.3rem 0.5rem;
+      border-radius: 4px;
+      border: 1px solid rgba(139, 127, 119, 0.3);
+      background: transparent;
+      color: var(--text-muted);
+      cursor: pointer;
+    }
+    .filter-btn:hover, .filter-btn.active {
+      border-color: var(--accent);
+      color: var(--accent);
+      background: rgba(255, 90, 45, 0.1);
+    }
+    .spot-card {
+      background: rgba(0,0,0,0.3);
+      border: 1px solid rgba(255, 90, 45, 0.12);
+      border-radius: 8px;
+      padding: 0.6rem;
+      margin-bottom: 0.5rem;
+      cursor: pointer;
+      transition: background 0.2s;
+    }
+    .spot-card:hover { background: rgba(255, 90, 45, 0.08); }
+    .spot-card h4 { font-size: 0.9rem; margin-bottom: 0.2rem; }
+    .spot-card .meta { font-size: 0.75rem; color: var(--muted); }
+    .modal-overlay {
+      position: fixed;
+      inset: 0;
+      background: rgba(0,0,0,0.7);
+      z-index: 2000;
+      display: none;
+      align-items: center;
+      justify-content: center;
+      padding: 1rem;
+    }
+    .modal-overlay.open { display: flex; }
+    .modal {
+      background: var(--bg-card);
+      border: 1px solid rgba(255, 90, 45, 0.2);
+      border-radius: 12px;
+      padding: 1.5rem;
+      max-width: 420px;
+      width: 100%;
+      max-height: 90vh;
+      overflow-y: auto;
+    }
+    .modal h2 { font-size: 1.1rem; margin-bottom: 1rem; }
+    .form-group { margin-bottom: 0.75rem; }
+    .form-group label {
+      display: block;
+      font-size: 0.8rem;
+      color: var(--muted);
+      margin-bottom: 0.25rem;
+    }
+    .form-group input, .form-group select, .form-group textarea {
+      width: 100%;
+      padding: 0.5rem;
+      border-radius: 6px;
+      border: 1px solid rgba(139, 127, 119, 0.3);
+      background: var(--bg-dark);
+      color: var(--text);
+      font-family: inherit;
+    }
+    .form-group textarea { min-height: 80px; resize: vertical; }
+    .form-actions { display: flex; gap: 0.5rem; margin-top: 1rem; }
+    .form-actions .btn { flex: 1; }
+    .auth-section { margin-top: 0.5rem; }
+    .auth-section input { margin-bottom: 0.5rem; }
+    .error { color: #e74c3c; font-size: 0.8rem; margin-top: 0.25rem; }
+    .popup-content .btn-edit, .popup-content .btn-delete {
+      font-size: 0.75rem; padding: 0.25rem 0.5rem; cursor: pointer;
+      border-radius: 4px; border: 1px solid rgba(255,90,45,0.3);
+      background: rgba(255,90,45,0.1); color: var(--accent);
+    }
+    .popup-content .btn-delete { border-color: rgba(231,76,60,0.5); color: #e74c3c; background: rgba(231,76,60,0.1); }
+    .user-email { font-size: 0.75rem; color: var(--muted); }
+    @media (max-width: 640px) {
+      .sidebar { width: 100%; max-height: 40vh; top: auto; bottom: 0; border-left: none; border-top: 1px solid rgba(255, 90, 45, 0.2); }
+      #map { bottom: 40vh; }
+    }
+  </style>
+</head>
+<body>
+  <header class="map-header">
+    <a href="index.html">← OpenClaw Hub</a>
+    <h1>🦞 Map</h1>
+    <div class="map-header-actions">
+      <span id="auth-status"></span>
+      <button type="button" class="btn" id="btn-auth" style="display:none">Sign in</button>
+      <button type="button" class="btn btn-primary" id="btn-add" style="display:none">Add spot</button>
+    </div>
+  </header>
+
+  <div id="map"></div>
+
+  <aside class="sidebar">
+    <div class="filter-row">
+      <button type="button" class="filter-btn active" data-filter="all">All</button>
+      <button type="button" class="filter-btn" data-filter="lobster">🦞 Lobster</button>
+      <button type="button" class="filter-btn" data-filter="meetup">🏠 Meetup</button>
+      <button type="button" class="filter-btn" data-filter="business">💰 Business</button>
+    </div>
+    <div id="spot-list"></div>
+  </aside>
+
+  <div class="modal-overlay" id="auth-modal">
+    <div class="modal">
+      <h2>Sign in to add spots</h2>
+      <div class="auth-section">
+        <div class="form-group">
+          <input type="email" id="auth-email" placeholder="Email">
+        </div>
+        <div class="form-group">
+          <input type="password" id="auth-password" placeholder="Password">
+        </div>
+        <div id="auth-error" class="error"></div>
+        <div class="form-actions">
+          <button type="button" class="btn" id="btn-signup">Sign up</button>
+          <button type="button" class="btn btn-primary" id="btn-signin">Sign in</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="modal-overlay" id="spot-modal">
+    <div class="modal">
+      <h2 id="spot-modal-title">Add spot</h2>
+      <form id="spot-form">
+        <input type="hidden" id="spot-id">
+        <div class="form-group">
+          <label>Name *</label>
+          <input type="text" id="spot-name" required>
+        </div>
+        <div class="form-group">
+          <label>Description</label>
+          <textarea id="spot-description"></textarea>
+        </div>
+        <div class="form-group">
+          <label>City *</label>
+          <input type="text" id="spot-city" required>
+        </div>
+        <div class="form-group">
+          <label>Category *</label>
+          <select id="spot-category">
+            <option value="lobster">🦞 Human Lobster / Builder</option>
+            <option value="meetup">🏠 Meetup & IRL Event</option>
+            <option value="business">💰 Business</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label>Image URL (optional)</label>
+          <input type="url" id="spot-image" placeholder="https://...">
+        </div>
+        <div class="form-group">
+          <label>Latitude *</label>
+          <input type="number" step="any" id="spot-lat" required placeholder="e.g. 40.7128">
+        </div>
+        <div class="form-group">
+          <label>Longitude *</label>
+          <input type="number" step="any" id="spot-lng" required placeholder="e.g. -74.0060">
+          <small style="color:var(--muted);font-size:0.75rem">Tip: <a href="https://www.latlong.net/" target="_blank" rel="noopener">latlong.net</a> or right-click on Google Maps</small>
+        </div>
+        <div class="form-actions">
+          <button type="button" class="btn" id="btn-cancel">Cancel</button>
+          <button type="submit" class="btn btn-primary">Save</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <script src="config.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" crossorigin=""></script>
+  <script src="map.js"></script>
+</body>
+</html>
