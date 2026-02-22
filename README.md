@@ -24,7 +24,7 @@ Sign in (email/password) to add content. Anyone can browse.
 
 1. Run the SQL in `supabase/schema.sql` in your Supabase project's SQL Editor (includes spots, help_skills, creations tables and event_date column).
 2. Create a Storage bucket named `spot-images` (Public: Yes) in Dashboard → Storage.
-3. Add Storage policies: (a) Public read: SELECT, bucket spot-images, USING (true); (b) Auth upload: INSERT, bucket spot-images, WITH CHECK (auth.role() = 'authenticated').
+3. Run `supabase/storage-policies.sql` in the SQL Editor to add upload and read policies.
 
 ### 2. Local development
 

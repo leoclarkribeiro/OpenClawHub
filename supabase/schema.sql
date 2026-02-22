@@ -55,10 +55,8 @@ CREATE POLICY "Users can delete own spots" ON spots
   FOR DELETE USING (auth.uid() = created_by);
 
 -- Storage bucket for images (spots + creations)
--- Run in Dashboard > Storage > New bucket: name "spot-images", Public: Yes
--- Policies (Storage > Policies > New policy):
--- 1. Public read: SELECT, bucket spot-images, USING (true)
--- 2. Auth upload: INSERT, bucket spot-images, WITH CHECK (auth.role() = 'authenticated')
+-- 1. Dashboard > Storage > New bucket: name "spot-images", Public: Yes
+-- 2. Run supabase/storage-policies.sql in SQL Editor (adds upload + read policies)
 
 -- ========== MIGRATIONS (run only if spots table already exists) ==========
 -- If you already ran the schema before, run from this line down.
