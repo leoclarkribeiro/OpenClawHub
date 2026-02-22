@@ -15,6 +15,9 @@
 
   let map, markers = [], currentFilter = 'all', spots = [], currentUser = null;
 
+  const params = new URLSearchParams(window.location.search);
+  if (params.get('filter') === 'meetup') currentFilter = 'meetup';
+
   // Map init
   map = L.map('map').setView([20, 0], 2);
   L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
@@ -157,6 +160,7 @@
         <div class="popup-content">
           <h3>${escapeHtml(spot.name)}</h3>
           <div class="category">${CATEGORIES[spot.category]?.icon || ''} ${CATEGORIES[spot.category]?.label || spot.category}</div>
+          ${spot.event_date ? '<div style="font-size:0.8rem;color:var(--accent);margin:0.25rem 0">📅 ' + escapeHtml(new Date(spot.event_date + 'T12:00:00').toLocaleDateString()) + '</div>' : ''}
           ${spot.description ? '<p style="font-size:0.85rem;margin:0.25rem 0">' + escapeHtml(spot.description) + '</p>' : ''}
           <div class="city">📍 ${escapeHtml(spot.city)}</div>
           ${spot.image_url ? '<img src="' + escapeHtml(spot.image_url) + '" style="max-width:100%;max-height:120px;border-radius:6px;margin-top:0.5rem" alt="">' : ''}
@@ -234,10 +238,18 @@
     document.getElementById('spot-city').value = (fromClick?.city ?? spot?.city) || '';
     document.getElementById('spot-category').value = spot?.category || 'lobster';
     document.getElementById('spot-image').value = spot?.image_url || '';
+    document.getElementById('spot-event-date').value = spot?.event_date || '';
     document.getElementById('spot-lat').value = fromClick?.lat ?? spot?.lat ?? '';
     document.getElementById('spot-lng').value = fromClick?.lng ?? spot?.lng ?? '';
+    const eventDateGroup = document.getElementById('event-date-group');
+    eventDateGroup.style.display = (spot?.category || fromClick?.category || 'lobster') === 'meetup' ? 'block' : 'none';
     modal.classList.add('open');
   }
+
+  document.getElementById('spot-category').addEventListener('change', () => {
+    document.getElementById('event-date-group').style.display =
+      document.getElementById('spot-category').value === 'meetup' ? 'block' : 'none';
+  });
 
   document.getElementById('btn-cancel').addEventListener('click', () => {
     document.getElementById('spot-modal').classList.remove('open');
@@ -256,12 +268,14 @@
       alert('Please click on the map to choose a location.');
       return;
     }
+    const category = document.getElementById('spot-category').value;
     const payload = {
       name: document.getElementById('spot-name').value.trim(),
       description: document.getElementById('spot-description').value.trim() || null,
       city: document.getElementById('spot-city').value.trim(),
-      category: document.getElementById('spot-category').value,
+      category,
       image_url: document.getElementById('spot-image').value.trim() || null,
+      event_date: category === 'meetup' ? document.getElementById('spot-event-date').value || null : null,
       lat,
       lng
     };
@@ -283,5 +297,9 @@
     loadSpots();
   }
 
-  loadSpots();
+  loadSpots().then(() => {
+    document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
+    const activeBtn = document.querySelector(`.filter-btn[data-filter="${currentFilter}"]`);
+    if (activeBtn) activeBtn.classList.add('active');
+  });
 })();

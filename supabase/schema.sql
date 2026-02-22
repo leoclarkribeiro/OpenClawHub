@@ -57,3 +57,46 @@ CREATE POLICY "Users can delete own spots" ON spots
 -- Storage bucket for spot images
 -- Run in Dashboard > Storage > New bucket: name "spot-images", Public: Yes
 -- Then add policy: Allow public SELECT (read) on spot-images
+
+-- ========== MIGRATIONS (run only if spots table already exists) ==========
+-- If you already ran the schema before, run from this line down.
+
+-- Add event_date to spots (for meetup/events calendar)
+ALTER TABLE spots ADD COLUMN IF NOT EXISTS event_date DATE;
+
+-- Help & skills table (ask for help, offer services, post bounties)
+CREATE TABLE IF NOT EXISTS help_skills (
+  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  type TEXT NOT NULL CHECK (type IN ('help', 'offer', 'bounty')),
+  title TEXT NOT NULL,
+  description TEXT,
+  skills TEXT,
+  contact TEXT,
+  created_at TIMESTAMPTZ DEFAULT now(),
+  created_by UUID REFERENCES auth.users(id) ON DELETE SET NULL
+);
+
+CREATE INDEX IF NOT EXISTS help_skills_type_idx ON help_skills (type);
+
+ALTER TABLE help_skills ENABLE ROW LEVEL SECURITY;
+CREATE POLICY "Public read help_skills" ON help_skills FOR SELECT USING (true);
+CREATE POLICY "Auth insert help_skills" ON help_skills FOR INSERT WITH CHECK (auth.role() = 'authenticated' AND created_by = auth.uid());
+CREATE POLICY "Auth update own help_skills" ON help_skills FOR UPDATE USING (auth.uid() = created_by);
+CREATE POLICY "Auth delete own help_skills" ON help_skills FOR DELETE USING (auth.uid() = created_by);
+
+-- Creations gallery
+CREATE TABLE IF NOT EXISTS creations (
+  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  title TEXT NOT NULL,
+  description TEXT,
+  image_url TEXT,
+  link TEXT,
+  created_at TIMESTAMPTZ DEFAULT now(),
+  created_by UUID REFERENCES auth.users(id) ON DELETE SET NULL
+);
+
+ALTER TABLE creations ENABLE ROW LEVEL SECURITY;
+CREATE POLICY "Public read creations" ON creations FOR SELECT USING (true);
+CREATE POLICY "Auth insert creations" ON creations FOR INSERT WITH CHECK (auth.role() = 'authenticated' AND created_by = auth.uid());
+CREATE POLICY "Auth update own creations" ON creations FOR UPDATE USING (auth.uid() = created_by);
+CREATE POLICY "Auth delete own creations" ON creations FOR DELETE USING (auth.uid() = created_by);

@@ -1,0 +1,161 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Help & Skills – OpenClaw Hub</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;600&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --muted: #8B7F77;
+      --accent: #FF5A2D;
+      --accent-bright: #FF7A3D;
+      --accent-dim: #D14A22;
+      --bg-dark: #0d0c0b;
+      --bg-card: #161412;
+      --text: #e8e4e0;
+      --text-muted: #8B7F77;
+    }
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body { font-family: 'Inter', -apple-system, sans-serif; background: var(--bg-dark); color: var(--text); min-height: 100vh; }
+    .page-header {
+      background: var(--bg-card);
+      border-bottom: 1px solid rgba(255, 90, 45, 0.2);
+      padding: 0.6rem 1rem;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      flex-wrap: wrap;
+      gap: 0.5rem;
+    }
+    .page-header a { color: var(--accent); text-decoration: none; font-family: 'JetBrains Mono', monospace; font-size: 0.85rem; }
+    .page-header a:hover { color: var(--accent-bright); }
+    .page-header h1 { font-family: 'JetBrains Mono', monospace; font-size: 1rem; font-weight: 600; }
+    .container { max-width: 720px; margin: 0 auto; padding: 1.5rem; }
+    .btn {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 0.8rem;
+      padding: 0.4rem 0.75rem;
+      border-radius: 6px;
+      border: 1px solid rgba(255, 90, 45, 0.3);
+      background: rgba(255, 90, 45, 0.1);
+      color: var(--accent);
+      cursor: pointer;
+    }
+    .btn:hover { background: rgba(255, 90, 45, 0.2); }
+    .btn-primary { background: var(--accent); color: white; border-color: var(--accent); }
+    .btn-primary:hover { background: var(--accent-bright); }
+    .filter-row { display: flex; gap: 0.35rem; margin-bottom: 1rem; flex-wrap: wrap; }
+    .filter-btn {
+      font-size: 0.75rem;
+      padding: 0.3rem 0.5rem;
+      border-radius: 4px;
+      border: 1px solid rgba(139, 127, 119, 0.3);
+      background: transparent;
+      color: var(--text-muted);
+      cursor: pointer;
+    }
+    .filter-btn:hover, .filter-btn.active { border-color: var(--accent); color: var(--accent); background: rgba(255, 90, 45, 0.1); }
+    .listing-card {
+      background: var(--bg-card);
+      border: 1px solid rgba(255, 90, 45, 0.12);
+      border-radius: 8px;
+      padding: 1rem;
+      margin-bottom: 0.75rem;
+    }
+    .listing-card .type-badge { font-size: 0.7rem; padding: 0.2rem 0.4rem; border-radius: 4px; margin-bottom: 0.5rem; display: inline-block; }
+    .listing-card .type-help { background: rgba(255, 138, 91, 0.2); color: #FF8A5B; }
+    .listing-card .type-offer { background: rgba(47, 191, 113, 0.2); color: #2FBF71; }
+    .listing-card .type-bounty { background: rgba(255, 90, 45, 0.2); color: var(--accent); }
+    .listing-card h3 { font-size: 1rem; margin-bottom: 0.35rem; }
+    .listing-card p { font-size: 0.9rem; color: var(--text-muted); margin-bottom: 0.25rem; }
+    .listing-card .meta { font-size: 0.75rem; color: var(--muted); }
+    .modal-overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.7); z-index: 2000; display: none; align-items: center; justify-content: center; padding: 1rem; }
+    .modal-overlay.open { display: flex; }
+    .modal { background: var(--bg-card); border: 1px solid rgba(255, 90, 45, 0.2); border-radius: 12px; padding: 1.5rem; max-width: 420px; width: 100%; max-height: 90vh; overflow-y: auto; }
+    .form-group { margin-bottom: 0.75rem; }
+    .form-group label { display: block; font-size: 0.8rem; color: var(--muted); margin-bottom: 0.25rem; }
+    .form-group input, .form-group select, .form-group textarea { width: 100%; padding: 0.5rem; border-radius: 6px; border: 1px solid rgba(139, 127, 119, 0.3); background: var(--bg-dark); color: var(--text); font-family: inherit; }
+    .form-group textarea { min-height: 80px; resize: vertical; }
+    .form-actions { display: flex; gap: 0.5rem; margin-top: 1rem; }
+    .user-email { font-size: 0.75rem; color: var(--muted); }
+  </style>
+</head>
+<body>
+  <header class="page-header">
+    <a href="index.html">← OpenClaw Hub</a>
+    <h1>🦞 Help & Skills</h1>
+    <div>
+      <span id="auth-status" class="user-email"></span>
+      <button type="button" class="btn" id="btn-auth" style="display:none">Sign in</button>
+      <button type="button" class="btn btn-primary" id="btn-add" style="display:none">Post</button>
+    </div>
+  </header>
+
+  <div class="container">
+    <div class="filter-row">
+      <button type="button" class="filter-btn active" data-filter="all">All</button>
+      <button type="button" class="filter-btn" data-filter="help">🙋 Ask for help</button>
+      <button type="button" class="filter-btn" data-filter="offer">🤝 Offer services</button>
+      <button type="button" class="filter-btn" data-filter="bounty">💰 Post bounty</button>
+    </div>
+    <div id="listings"></div>
+  </div>
+
+  <div class="modal-overlay" id="auth-modal">
+    <div class="modal">
+      <h2 style="font-size:1.1rem;margin-bottom:1rem">Sign in to post</h2>
+      <div class="form-group"><input type="email" id="auth-email" placeholder="Email"></div>
+      <div class="form-group"><input type="password" id="auth-password" placeholder="Password"></div>
+      <div id="auth-error" style="color:#e74c3c;font-size:0.8rem;margin-top:0.25rem"></div>
+      <div class="form-actions">
+        <button type="button" class="btn" id="btn-signup">Sign up</button>
+        <button type="button" class="btn btn-primary" id="btn-signin">Sign in</button>
+      </div>
+    </div>
+  </div>
+
+  <div class="modal-overlay" id="post-modal">
+    <div class="modal">
+      <h2 style="font-size:1.1rem;margin-bottom:1rem">Post</h2>
+      <form id="post-form">
+        <input type="hidden" id="post-id">
+        <div class="form-group">
+          <label>Type *</label>
+          <select id="post-type">
+            <option value="help">🙋 Ask for help</option>
+            <option value="offer">🤝 Offer services</option>
+            <option value="bounty">💰 Post bounty</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label>Title *</label>
+          <input type="text" id="post-title" required placeholder="e.g. Need help with OpenClaw skills">
+        </div>
+        <div class="form-group">
+          <label>Description</label>
+          <textarea id="post-description" placeholder="Describe what you need or offer..."></textarea>
+        </div>
+        <div class="form-group">
+          <label>Skills (comma-separated)</label>
+          <input type="text" id="post-skills" placeholder="e.g. Python, automation, WhatsApp">
+        </div>
+        <div class="form-group">
+          <label>Contact (email, Discord, etc.)</label>
+          <input type="text" id="post-contact" placeholder="How to reach you">
+        </div>
+        <div class="form-actions">
+          <button type="button" class="btn" id="btn-cancel">Cancel</button>
+          <button type="submit" class="btn btn-primary">Save</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <script src="config.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script src="help.js"></script>
+</body>
+</html>

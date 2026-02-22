@@ -8,21 +8,21 @@ OpenClaw Hub is where human lobsters connect, share experiences, get help and ex
 
 [OpenClaw](https://openclaw.ai/) is a personal AI assistant that actually does things. It clears your inbox, sends emails, manages your calendar, checks you in for flights, all from WhatsApp, Telegram, Discord, or any chat app you already use. It runs on your machine, remembers you with persistent memory, and can browse the web, run commands, and extend itself with skills. Your data stays yours. It's open source, hackable, and built by a growing community.
 
-## Map Feature
+## Features
 
-The [OpenClaw Hub Map](map.html) lets you browse, add, edit, and delete spots around the world. Categories:
+- **[Map](map.html)** – Browse, add, edit spots (lobsters, meetups, businesses). Click on map to add.
+- **[Create / Join community](map.html?filter=meetup)** – Find or add meetup spots.
+- **[Help & skills](help.html)** – Ask for help, offer services, post bounties.
+- **[Show your creations](creations.html)** – Gallery of community projects.
+- **[Events calendar](calendar.html)** – Meetup events by date.
 
-- 🦞 **Human Lobster / Builder** – Community members and builders
-- 🏠 **Meetup & IRL Event** – Meetups and in-person events
-- 💰 **Business** – Businesses in the OpenClaw ecosystem
-
-Sign in (email/password) to add spots. Anyone can browse.
+Sign in (email/password) to add content. Anyone can browse.
 
 ## Setup
 
 ### 1. Supabase
 
-1. Run the SQL in `supabase/schema.sql` in your Supabase project's SQL Editor.
+1. Run the SQL in `supabase/schema.sql` in your Supabase project's SQL Editor (includes spots, help_skills, creations tables and event_date column).
 2. Create a Storage bucket named `spot-images` (Public: Yes) in Dashboard → Storage.
 3. Add a policy: allow public SELECT (read) on `spot-images`.
 
