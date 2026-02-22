@@ -54,9 +54,11 @@ CREATE POLICY "Users can update own spots" ON spots
 CREATE POLICY "Users can delete own spots" ON spots
   FOR DELETE USING (auth.uid() = created_by);
 
--- Storage bucket for spot images
+-- Storage bucket for images (spots + creations)
 -- Run in Dashboard > Storage > New bucket: name "spot-images", Public: Yes
--- Then add policy: Allow public SELECT (read) on spot-images
+-- Policies (Storage > Policies > New policy):
+-- 1. Public read: SELECT, bucket spot-images, USING (true)
+-- 2. Auth upload: INSERT, bucket spot-images, WITH CHECK (auth.role() = 'authenticated')
 
 -- ========== MIGRATIONS (run only if spots table already exists) ==========
 -- If you already ran the schema before, run from this line down.

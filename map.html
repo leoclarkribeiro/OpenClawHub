@@ -269,8 +269,10 @@
           </select>
         </div>
         <div class="form-group">
-          <label>Image URL (optional)</label>
-          <input type="url" id="spot-image" placeholder="https://...">
+          <label>Image (optional)</label>
+          <input type="file" id="spot-image" accept="image/*">
+          <div id="spot-image-preview" style="margin-top:0.5rem;max-width:200px"></div>
+          <button type="button" class="btn" id="spot-image-remove" style="margin-top:0.35rem;font-size:0.75rem;display:none">Remove image</button>
         </div>
         <div class="form-group" id="event-date-group" style="display:none">
           <label>Event date (for calendar)</label>

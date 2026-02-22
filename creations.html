@@ -121,8 +121,10 @@
           <textarea id="creation-description" placeholder="What did you build?"></textarea>
         </div>
         <div class="form-group">
-          <label>Image URL</label>
-          <input type="url" id="creation-image" placeholder="https://...">
+          <label>Image</label>
+          <input type="file" id="creation-image" accept="image/*">
+          <div id="creation-image-preview" style="margin-top:0.5rem;max-width:200px"></div>
+          <button type="button" class="btn" id="creation-image-remove" style="margin-top:0.35rem;font-size:0.75rem;display:none">Remove image</button>
         </div>
         <div class="form-group">
           <label>Link (repo, demo, etc.)</label>

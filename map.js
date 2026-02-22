@@ -237,18 +237,48 @@
     document.getElementById('spot-description').value = spot?.description || '';
     document.getElementById('spot-city').value = (fromClick?.city ?? spot?.city) || '';
     document.getElementById('spot-category').value = spot?.category || 'lobster';
-    document.getElementById('spot-image').value = spot?.image_url || '';
+    document.getElementById('spot-image').value = '';
+    document.getElementById('spot-image').dataset.existingUrl = spot?.image_url || '';
+    document.getElementById('spot-image').dataset.removeImage = '';
+    const preview = document.getElementById('spot-image-preview');
+    preview.innerHTML = spot?.image_url ? `<img src="${escapeHtml(spot.image_url)}" alt="" style="max-width:100%;border-radius:6px;border:1px solid rgba(255,90,45,0.2)">` : '';
     document.getElementById('spot-event-date').value = spot?.event_date || '';
     document.getElementById('spot-lat').value = fromClick?.lat ?? spot?.lat ?? '';
     document.getElementById('spot-lng').value = fromClick?.lng ?? spot?.lng ?? '';
     const eventDateGroup = document.getElementById('event-date-group');
     eventDateGroup.style.display = (spot?.category || fromClick?.category || 'lobster') === 'meetup' ? 'block' : 'none';
+    const removeBtn = document.getElementById('spot-image-remove');
+    removeBtn.style.display = spot?.image_url ? 'inline-block' : 'none';
     modal.classList.add('open');
   }
 
   document.getElementById('spot-category').addEventListener('change', () => {
     document.getElementById('event-date-group').style.display =
       document.getElementById('spot-category').value === 'meetup' ? 'block' : 'none';
+  });
+
+  document.getElementById('spot-image').addEventListener('change', (e) => {
+    const file = e.target.files?.[0];
+    const preview = document.getElementById('spot-image-preview');
+    const removeBtn = document.getElementById('spot-image-remove');
+    e.target.dataset.removeImage = '';
+    if (file) {
+      const url = URL.createObjectURL(file);
+      preview.innerHTML = `<img src="${url}" alt="" style="max-width:100%;border-radius:6px;border:1px solid rgba(255,90,45,0.2)">`;
+      removeBtn.style.display = 'none';
+    } else {
+      const existing = e.target.dataset.existingUrl;
+      preview.innerHTML = existing ? `<img src="${existing}" alt="" style="max-width:100%;border-radius:6px;border:1px solid rgba(255,90,45,0.2)">` : '';
+      removeBtn.style.display = existing ? 'inline-block' : 'none';
+    }
+  });
+
+  document.getElementById('spot-image-remove').addEventListener('click', () => {
+    document.getElementById('spot-image').value = '';
+    document.getElementById('spot-image').dataset.existingUrl = '';
+    document.getElementById('spot-image').dataset.removeImage = '1';
+    document.getElementById('spot-image-preview').innerHTML = '';
+    document.getElementById('spot-image-remove').style.display = 'none';
   });
 
   document.getElementById('btn-cancel').addEventListener('click', () => {
@@ -269,12 +299,23 @@
       return;
     }
     const category = document.getElementById('spot-category').value;
+    const fileInput = document.getElementById('spot-image');
+    let imageUrl = fileInput.dataset.removeImage ? null : (fileInput.dataset.existingUrl || null);
+    if (fileInput.files?.[0]) {
+      const file = fileInput.files[0];
+      const ext = file.name.split('.').pop() || 'jpg';
+      const path = `spots/${crypto.randomUUID()}.${ext}`;
+      const { error: uploadError } = await supabase.storage.from('spot-images').upload(path, file, { upsert: true });
+      if (uploadError) { alert('Image upload failed: ' + uploadError.message); return; }
+      const { data } = supabase.storage.from('spot-images').getPublicUrl(path);
+      imageUrl = data.publicUrl;
+    }
     const payload = {
       name: document.getElementById('spot-name').value.trim(),
       description: document.getElementById('spot-description').value.trim() || null,
       city: document.getElementById('spot-city').value.trim(),
       category,
-      image_url: document.getElementById('spot-image').value.trim() || null,
+      image_url: imageUrl,
       event_date: category === 'meetup' ? document.getElementById('spot-event-date').value || null : null,
       lat,
       lng
