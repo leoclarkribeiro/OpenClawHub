@@ -23,7 +23,6 @@
     }
     * { margin: 0; padding: 0; box-sizing: border-box; }
     body { font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif; background: var(--bg-dark); color: var(--text); min-height: 100vh; line-height: 1.6; }
-    body { padding-left: 220px; }
     .container { max-width: 720px; margin: 0 auto; padding: 3rem 1.5rem; }
     header { text-align: center; margin-bottom: 3rem; }
     .logo { font-size: 2.5rem; margin-bottom: 0.5rem; }
@@ -45,42 +44,19 @@
     footer { margin-top: 3rem; padding-top: 2rem; border-top: 1px solid rgba(139, 127, 119, 0.2); text-align: center; color: var(--text-muted); font-size: 0.875rem; }
     footer a { color: var(--accent-dim); text-decoration: none; }
     footer a:hover { color: var(--accent); }
-    .page-header { position: fixed; top: 0; left: 0; right: 0; z-index: 100; background: var(--bg-card); border-bottom: 1px solid rgba(255, 90, 45, 0.2); padding: 0.6rem 1rem; }
+    .page-header { position: fixed; top: 0; left: 0; right: 0; z-index: 100; background: var(--bg-card); border-bottom: 1px solid rgba(255, 90, 45, 0.2); padding: 0.6rem 1rem; display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 0.5rem; }
     .page-header a { color: var(--accent); text-decoration: none; font-family: 'JetBrains Mono', monospace; font-size: 0.85rem; }
     .page-header a:hover { color: var(--accent-bright); }
-    .nav-menu {
-      position: fixed;
-      top: 52px;
-      left: 0;
-      width: 220px;
-      height: calc(100vh - 52px);
-      background: var(--bg-card);
-      border-right: 1px solid rgba(255, 90, 45, 0.2);
-      z-index: 400;
-      padding: 0.75rem 0;
-      overflow-y: auto;
-    }
-    .nav-menu a {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      padding: 0.35rem 0.75rem;
-      font-size: 0.8rem;
-      color: var(--text-muted);
-      text-decoration: none;
-      transition: color 0.15s, background 0.15s;
-    }
-    .nav-menu a:hover { color: var(--text); background: rgba(255, 90, 45, 0.06); }
-    .nav-menu .menu-item-text { flex: 1; min-width: 0; }
-    @media (max-width: 900px) {
-      .nav-menu { width: 180px; }
-      body { padding-left: 180px; }
-    }
-    @media (max-width: 640px) {
-      .nav-menu { width: 100%; height: auto; position: relative; top: 52px; border-right: none; border-bottom: 1px solid rgba(255, 90, 45, 0.2); display: flex; flex-wrap: wrap; gap: 0.25rem; padding: 0.5rem; }
-      .nav-menu a { padding: 0.3rem 0.5rem; }
-      body { padding-left: 0; }
-    }
+    .page-header h1 { font-family: 'JetBrains Mono', monospace; font-size: 1rem; font-weight: 600; }
+    .menu-trigger { background: var(--bg-card); border: 1px solid rgba(255, 90, 45, 0.2); border-radius: 6px; padding: 0.35rem 0.6rem; font-family: 'JetBrains Mono', monospace; font-size: 0.8rem; color: var(--accent); cursor: pointer; display: flex; align-items: center; gap: 0.4rem; }
+    .menu-trigger:hover { border-color: var(--accent-dim); background: rgba(255, 90, 45, 0.08); }
+    .menu-panel { position: fixed; top: 52px; left: 1rem; z-index: 99; background: var(--bg-card); border: 1px solid rgba(255, 90, 45, 0.2); border-radius: 10px; padding: 0.35rem 0; min-width: 240px; box-shadow: 0 8px 32px rgba(0, 0, 0, 0.4); display: none; }
+    .menu-panel.open { display: block; }
+    .menu-panel a { display: flex; padding: 0.3rem 0.6rem; font-size: 0.8rem; color: var(--text-muted); text-decoration: none; transition: color 0.15s, background 0.15s; }
+    .menu-panel a:hover { color: var(--text); background: rgba(255, 90, 45, 0.06); }
+    .menu-panel .menu-item-text { flex: 1; min-width: 0; }
+    .menu-overlay { position: fixed; inset: 0; z-index: 98; background: transparent; display: none; }
+    .menu-overlay.open { display: block; }
   </style>
   <script>window.va = window.va || function () { (window.vaq = window.vaq || []).push(arguments); };</script>
   <script defer src="/_vercel/insights/script.js"></script>
@@ -89,9 +65,11 @@
 </head>
 <body>
   <header class="page-header">
-    <a href="index.html">← Map</a>
+    <h1>🦞 OpenClaw Hub</h1>
+    <button type="button" class="menu-trigger" id="menu-trigger" aria-expanded="false" aria-controls="menu-panel"><span aria-hidden="true">☰</span> Menu</button>
   </header>
-  <nav class="nav-menu" role="navigation" aria-label="Main navigation">
+  <div class="menu-overlay" id="menu-overlay" aria-hidden="true"></div>
+  <nav class="menu-panel" id="menu-panel" role="menu" aria-label="Main navigation">
     <a href="index.html"><span class="menu-item-text">Browse the OpenClaw Hub map</span></a>
     <a href="index.html?filter=meetup"><span class="menu-item-text">Create / Join your local community</span></a>
     <a href="help.html"><span class="menu-item-text">Help & skills</span></a>
@@ -124,5 +102,11 @@
       <p style="margin-top: 0.5rem;"><a href="https://openclaw.ai/" target="_blank" rel="noopener noreferrer">openclaw.ai</a></p>
     </footer>
   </div>
+  <script>
+    (function(){var t=document.getElementById('menu-trigger'),p=document.getElementById('menu-panel'),o=document.getElementById('menu-overlay');
+    function toggle(){var open=!p.classList.contains('open');p.classList.toggle('open',open);o.classList.toggle('open',open);t.setAttribute('aria-expanded',open);}
+    function close(){p.classList.remove('open');o.classList.remove('open');t.setAttribute('aria-expanded','false');}
+    t&&t.addEventListener('click',toggle);o&&o.addEventListener('click',close);})();
+  </script>
 </body>
 </html>

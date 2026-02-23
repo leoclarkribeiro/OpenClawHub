@@ -21,20 +21,20 @@
     }
     * { margin: 0; padding: 0; box-sizing: border-box; }
     body { font-family: 'Inter', -apple-system, sans-serif; background: var(--bg-dark); color: var(--text); min-height: 100vh; }
-    .page-header {
-      background: var(--bg-card);
-      border-bottom: 1px solid rgba(255, 90, 45, 0.2);
-      padding: 0.6rem 1rem;
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      flex-wrap: wrap;
-      gap: 0.5rem;
-    }
+    .page-header { position: fixed; top: 0; left: 0; right: 0; z-index: 100; background: var(--bg-card); border-bottom: 1px solid rgba(255, 90, 45, 0.2); padding: 0.6rem 1rem; display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 0.5rem; }
     .page-header a { color: var(--accent); text-decoration: none; font-family: 'JetBrains Mono', monospace; font-size: 0.85rem; }
     .page-header a:hover { color: var(--accent-bright); }
     .page-header h1 { font-family: 'JetBrains Mono', monospace; font-size: 1rem; font-weight: 600; }
-    .container { max-width: 900px; margin: 0 auto; padding: 1.5rem; }
+    .menu-trigger { background: var(--bg-card); border: 1px solid rgba(255, 90, 45, 0.2); border-radius: 6px; padding: 0.35rem 0.6rem; font-family: 'JetBrains Mono', monospace; font-size: 0.8rem; color: var(--accent); cursor: pointer; display: flex; align-items: center; gap: 0.4rem; }
+    .menu-trigger:hover { border-color: var(--accent-dim); background: rgba(255, 90, 45, 0.08); }
+    .menu-panel { position: fixed; top: 52px; left: 1rem; z-index: 99; background: var(--bg-card); border: 1px solid rgba(255, 90, 45, 0.2); border-radius: 10px; padding: 0.35rem 0; min-width: 240px; box-shadow: 0 8px 32px rgba(0, 0, 0, 0.4); display: none; }
+    .menu-panel.open { display: block; }
+    .menu-panel a { display: flex; padding: 0.3rem 0.6rem; font-size: 0.8rem; color: var(--text-muted); text-decoration: none; transition: color 0.15s, background 0.15s; }
+    .menu-panel a:hover { color: var(--text); background: rgba(255, 90, 45, 0.06); }
+    .menu-panel .menu-item-text { flex: 1; min-width: 0; }
+    .menu-overlay { position: fixed; inset: 0; z-index: 98; background: transparent; display: none; }
+    .menu-overlay.open { display: block; }
+    .container { max-width: 900px; margin: 0 auto; padding: 1.5rem; padding-top: 4rem; }
     .btn {
       font-family: 'JetBrains Mono', monospace;
       font-size: 0.8rem;
@@ -90,14 +90,23 @@
 </head>
 <body>
   <header class="page-header">
-    <a href="index.html">← Map</a>
-    <h1>🦞 Show your creations</h1>
-    <div>
+    <h1>🦞 OpenClaw Hub</h1>
+    <div style="display:flex;align-items:center;gap:0.5rem">
+      <button type="button" class="menu-trigger" id="menu-trigger" aria-expanded="false" aria-controls="menu-panel"><span aria-hidden="true">☰</span> Menu</button>
       <span id="auth-status" class="user-email"></span>
       <button type="button" class="btn" id="btn-auth" style="display:none">Sign in</button>
       <button type="button" class="btn btn-primary" id="btn-add" style="display:none">Add creation</button>
     </div>
   </header>
+  <div class="menu-overlay" id="menu-overlay" aria-hidden="true"></div>
+  <nav class="menu-panel" id="menu-panel" role="menu" aria-label="Main navigation">
+    <a href="index.html"><span class="menu-item-text">Browse the OpenClaw Hub map</span></a>
+    <a href="index.html?filter=meetup"><span class="menu-item-text">Create / Join your local community</span></a>
+    <a href="help.html"><span class="menu-item-text">Help & skills</span></a>
+    <a href="creations.html"><span class="menu-item-text">Show your creations</span></a>
+    <a href="calendar.html"><span class="menu-item-text">Events calendar</span></a>
+    <a href="about.html"><span class="menu-item-text">About</span></a>
+  </nav>
 
   <div class="container">
     <div id="gallery" class="gallery"></div>
@@ -149,6 +158,12 @@
 
   <script src="config.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script>
+    (function(){var t=document.getElementById('menu-trigger'),p=document.getElementById('menu-panel'),o=document.getElementById('menu-overlay');
+    function toggle(){var open=!p.classList.contains('open');p.classList.toggle('open',open);o.classList.toggle('open',open);t.setAttribute('aria-expanded',open);}
+    function close(){p.classList.remove('open');o.classList.remove('open');t.setAttribute('aria-expanded','false');}
+    t&&t.addEventListener('click',toggle);o&&o.addEventListener('click',close);})();
+  </script>
   <script src="creations.js"></script>
 </body>
 </html>
