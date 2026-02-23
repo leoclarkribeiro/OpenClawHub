@@ -71,6 +71,9 @@
     setTimeout(() => {
       if (map) google.maps.event.trigger(map, 'resize');
     }, 100);
+    window.addEventListener('resize', () => {
+      if (map) google.maps.event.trigger(map, 'resize');
+    });
 
     map.addListener('click', async (e) => {
       if (!e.placeId && currentUser) {
