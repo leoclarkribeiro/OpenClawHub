@@ -32,14 +32,24 @@
         resolve();
         return;
       }
-      window._openclawMapsReady = resolve;
+      const timeout = setTimeout(() => {
+        reject(new Error('Map load timeout. Check API key, billing, and HTTP referrer restrictions for your domain.'));
+      }, 15000);
+      window._openclawMapsReady = () => {
+        clearTimeout(timeout);
+        resolve();
+      };
       window.gm_authFailure = () => {
-        showMapError('Google Maps API key invalid or restricted. Check: 1) Billing enabled in Google Cloud, 2) Maps JavaScript API enabled, 3) Key restrictions allow this site (e.g. localhost/*).');
+        clearTimeout(timeout);
+        showMapError('Google Maps API key invalid or restricted. Check: 1) Billing enabled in Google Cloud, 2) Maps JavaScript API enabled, 3) Key restrictions allow this site (e.g. *.vercel.app, your domain).');
       };
       const script = document.createElement('script');
       script.src = `https://maps.googleapis.com/maps/api/js?key=${encodeURIComponent(googleMapsKey)}&callback=_openclawMapsReady&loading=async`;
       script.async = true;
-      script.onerror = () => reject(new Error('Failed to load Google Maps script (network error)'));
+      script.onerror = () => {
+        clearTimeout(timeout);
+        reject(new Error('Failed to load Google Maps script (network error)'));
+      };
       document.head.appendChild(script);
     });
   }
@@ -50,12 +60,17 @@
   }
 
   function initMap() {
-    map = new google.maps.Map(document.getElementById('map'), {
+    const mapEl = document.getElementById('map');
+    mapEl.innerHTML = '';
+    map = new google.maps.Map(mapEl, {
       center: { lat: 20, lng: 0 },
       zoom: 2,
       mapTypeId: 'terrain',
       styles: [{ featureType: 'poi', stylers: [{ visibility: 'off' }] }]
     });
+    setTimeout(() => {
+      if (map) google.maps.event.trigger(map, 'resize');
+    }, 100);
 
     map.addListener('click', async (e) => {
       if (!e.placeId && currentUser) {
