@@ -11,6 +11,8 @@
     return;
   }
 
+  document.getElementById('map').innerHTML = '<div style="padding:2rem;text-align:center;color:var(--text-muted)">Loading map…</div>';
+
   const supabase = window.supabase.createClient(config.supabaseUrl, config.supabaseAnonKey);
 
   const CATEGORIES = {
@@ -35,7 +37,7 @@
         showMapError('Google Maps API key invalid or restricted. Check: 1) Billing enabled in Google Cloud, 2) Maps JavaScript API enabled, 3) Key restrictions allow this site (e.g. localhost/*).');
       };
       const script = document.createElement('script');
-      script.src = `https://maps.googleapis.com/maps/api/js?key=${encodeURIComponent(googleMapsKey)}&callback=_openclawMapsReady&loading=async&libraries=marker`;
+      script.src = `https://maps.googleapis.com/maps/api/js?key=${encodeURIComponent(googleMapsKey)}&callback=_openclawMapsReady&loading=async`;
       script.async = true;
       script.onerror = () => reject(new Error('Failed to load Google Maps script (network error)'));
       document.head.appendChild(script);
@@ -52,7 +54,7 @@
       center: { lat: 20, lng: 0 },
       zoom: 2,
       mapTypeId: 'terrain',
-      mapId: 'DEMO_MAP_ID'
+      styles: [{ featureType: 'poi', stylers: [{ visibility: 'off' }] }]
     });
 
     map.addListener('click', async (e) => {
@@ -178,33 +180,18 @@
 
   function renderMarkers() {
     markers.forEach(m => {
-      if (m.marker) {
-        if (m.marker.map != null) m.marker.map = null;
-        else if (m.marker.setMap) m.marker.setMap(null);
-      }
+      if (m.marker) m.marker.setMap(null);
       if (m.infoWindow) m.infoWindow.close();
     });
     markers = [];
     const filtered = currentFilter === 'all' ? spots : spots.filter(s => s.category === currentFilter);
     filtered.forEach(spot => {
-      let marker;
-      if (google.maps.marker?.AdvancedMarkerElement) {
-        const pinEl = document.createElement('div');
-        pinEl.textContent = CATEGORIES[spot.category]?.icon || '📍';
-        pinEl.style.cssText = 'font-size:18px;text-align:center;line-height:1;width:28px;height:28px;background:#FF5A2D;border:2px solid #D14A22;border-radius:50%;display:flex;align-items:center;justify-content:center';
-        marker = new google.maps.marker.AdvancedMarkerElement({
-          map,
-          position: { lat: spot.lat, lng: spot.lng },
-          content: pinEl
-        });
-      } else {
-        marker = new google.maps.Marker({
-          position: { lat: spot.lat, lng: spot.lng },
-          map,
-          label: { text: CATEGORIES[spot.category]?.icon || '📍', color: '#333', fontSize: '16px' },
-          icon: { path: google.maps.SymbolPath.CIRCLE, scale: 14, fillColor: '#FF5A2D', fillOpacity: 0.95, strokeColor: '#D14A22', strokeWeight: 2 }
-        });
-      }
+      const marker = new google.maps.Marker({
+        position: { lat: spot.lat, lng: spot.lng },
+        map,
+        label: { text: CATEGORIES[spot.category]?.icon || '📍', color: '#333', fontSize: '16px' },
+        icon: { path: google.maps.SymbolPath.CIRCLE, scale: 14, fillColor: '#FF5A2D', fillOpacity: 0.95, strokeColor: '#D14A22', strokeWeight: 2 }
+      });
       const content = `
         <div class="popup-content">
           <h3>${escapeHtml(spot.name)}</h3>
@@ -222,9 +209,7 @@
         </div>
       `;
       const infoWindow = new google.maps.InfoWindow({ content });
-      const AdvMarker = google.maps.marker?.AdvancedMarkerElement;
-      const clickEv = (AdvMarker && marker instanceof AdvMarker) ? 'gmp-click' : 'click';
-      marker.addListener(clickEv, () => {
+      marker.addListener('click', () => {
         markers.forEach(m => m.infoWindow?.close());
         infoWindow.open(map, marker);
       });
