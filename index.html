@@ -96,10 +96,14 @@
       #map { left: 0; bottom: 40vh; }
     }
   </style>
-  <script>window.va = window.va || function () { (window.vaq = window.vaq || []).push(arguments); };</script>
-  <script defer src="/_vercel/insights/script.js"></script>
-  <script>window.si = window.si || function () { (window.siq = window.siq || []).push(arguments); };</script>
-  <script defer src="/_vercel/speed-insights/script.js"></script>
+  <script>
+    if (!/localhost|127\.0\.0\.1/.test(location.hostname)) {
+      window.va = window.va || function () { (window.vaq = window.vaq || []).push(arguments); };
+      var vi = document.createElement('script'); vi.src = '/_vercel/insights/script.js'; vi.defer = true; document.head.appendChild(vi);
+      window.si = window.si || function () { (window.siq = window.siq || []).push(arguments); };
+      var vs = document.createElement('script'); vs.src = '/_vercel/speed-insights/script.js'; vs.defer = true; document.head.appendChild(vs);
+    }
+  </script>
 </head>
 <body>
   <header class="map-header">
