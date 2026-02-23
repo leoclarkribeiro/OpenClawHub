@@ -25,7 +25,7 @@ Sign in (email/password) to add content. Anyone can browse.
 1. Run the SQL in `supabase/schema.sql` in your Supabase project's SQL Editor (includes spots, help_skills, creations tables and event_date column).
 2. Create a Storage bucket named `spot-images` (Public: Yes) in Dashboard → Storage.
 3. Run `supabase/storage-policies.sql` in the SQL Editor to add upload and read policies.
-4. (Optional) For Stamen Terrain map tiles: sign up at [Stadia Maps](https://stadiamaps.com/) (free), get an API key, and add `VITE_STADIA_API_KEY` to Vercel env vars or `stadiaApiKey` in config.js.
+4. **Google Maps**: Enable Maps JavaScript API and Geocoding API in [Google Cloud Console](https://console.cloud.google.com/). Add your API key to `config.js` as `googleMapsApiKey`, or set `VITE_GOOGLE_MAPS_API_KEY` for Vercel builds. Restrict the key by HTTP referrer in production.
 
 ### 2. Local development
 
@@ -36,7 +36,7 @@ export VITE_SUPABASE_ANON_KEY="your-anon-key"
 npm run build
 ```
 
-Or use the existing `config.js` (already configured for this project).
+Or use the existing `config.js`. Add your Google Maps API key to `googleMapsApiKey` for the map to load.
 
 ```bash
 python3 -m http.server 8080
@@ -50,6 +50,7 @@ Add these environment variables in Vercel:
 
 - `VITE_SUPABASE_URL` – Your Supabase project URL
 - `VITE_SUPABASE_ANON_KEY` – Your Supabase anon (public) key
+- `VITE_GOOGLE_MAPS_API_KEY` – Your Google Maps API key (Maps JavaScript API + Geocoding API)
 
 The build step generates `config.js` from these env vars.
 

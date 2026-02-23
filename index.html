@@ -7,7 +7,6 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;600&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" crossorigin="">
   <style>
     :root {
       --muted: #8B7F77;
@@ -56,8 +55,8 @@
     .nav-menu a:hover { color: var(--text); background: rgba(255, 90, 45, 0.06); }
     .nav-menu .menu-item-text { flex: 1; min-width: 0; }
     #map { position: fixed; top: 52px; left: 220px; right: 0; bottom: 0; z-index: 1; cursor: pointer; }
-    .leaflet-popup-content-wrapper { background: var(--bg-card); color: var(--text); border: 1px solid rgba(255, 90, 45, 0.2); border-radius: 8px; }
-    .leaflet-popup-tip { background: var(--bg-card); }
+    .gm-style .gm-style-iw-c { background: var(--bg-card); color: var(--text); border: 1px solid rgba(255, 90, 45, 0.2); border-radius: 8px; padding: 0.5rem; }
+    .gm-style .gm-style-iw-d { overflow: auto !important; }
     .popup-content { min-width: 200px; }
     .popup-content h3 { font-size: 0.95rem; margin-bottom: 0.25rem; }
     .popup-content .category { font-size: 0.75rem; color: var(--muted); margin-bottom: 0.25rem; }
@@ -187,7 +186,6 @@
 
   <script src="config.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-  <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" crossorigin=""></script>
   <script src="map.js"></script>
 </body>
 </html>

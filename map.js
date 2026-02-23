@@ -4,6 +4,12 @@
     console.error('Missing Supabase config. Ensure config.js is loaded.');
     return;
   }
+  const googleMapsKey = config.googleMapsApiKey || '';
+  if (!googleMapsKey) {
+    console.error('Missing googleMapsApiKey in config.js. Add your Google Maps API key.');
+    document.getElementById('map').innerHTML = '<div style="padding:2rem;text-align:center;color:var(--text-muted)">Add your Google Maps API key to config.js</div>';
+    return;
+  }
 
   const supabase = window.supabase.createClient(config.supabaseUrl, config.supabaseAnonKey);
 
@@ -18,33 +24,40 @@
   const params = new URLSearchParams(window.location.search);
   if (params.get('filter') === 'meetup') currentFilter = 'meetup';
 
-  // Map init - Stamen Terrain (Stadia Maps) when key present, else OpenTopoMap
-  map = L.map('map').setView([20, 0], 2);
-  const stadiaKey = config.stadiaApiKey || '';
-  if (stadiaKey) {
-    const terrainUrl = 'https://tiles.stadiamaps.com/tiles/stamen_terrain/{z}/{x}/{y}{r}.png?api_key=' + stadiaKey;
-    L.tileLayer(terrainUrl, {
-      attribution: '&copy; <a href="https://stadiamaps.com/">Stadia Maps</a> &copy; <a href="https://stamen.com/">Stamen Design</a> &copy; <a href="https://openmaptiles.org/">OpenMapTiles</a> &copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a>',
-      maxZoom: 20
-    }).addTo(map);
-  } else {
-    L.tileLayer('https://{s}.tile.opentopomap.org/{z}/{x}/{y}.png', {
-      attribution: '&copy; <a href="https://opentopomap.org/">OpenTopoMap</a> &copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a>',
-      maxZoom: 17
-    }).addTo(map);
+  function loadGoogleMaps() {
+    return new Promise((resolve, reject) => {
+      if (window.google?.maps) {
+        resolve();
+        return;
+      }
+      window._openclawMapsReady = resolve;
+      const script = document.createElement('script');
+      script.src = `https://maps.googleapis.com/maps/api/js?key=${encodeURIComponent(googleMapsKey)}&callback=_openclawMapsReady`;
+      script.async = true;
+      script.onerror = () => reject(new Error('Failed to load Google Maps'));
+      document.head.appendChild(script);
+    });
   }
 
-  // Map click: add spot (signed in) or prompt sign in (signed out)
-  map.on('click', async (e) => {
-    if (e.originalEvent.target.closest('.leaflet-marker-icon, .leaflet-popup, .leaflet-popup-content')) return;
-    if (currentUser) {
-      const { lat, lng } = e.latlng;
-      const city = await reverseGeocode(lat, lng);
-      openSpotModal(null, { lat, lng, city });
-    } else {
-      document.getElementById('auth-modal').classList.add('open');
-    }
-  });
+  function initMap() {
+    map = new google.maps.Map(document.getElementById('map'), {
+      center: { lat: 20, lng: 0 },
+      zoom: 2,
+      mapTypeId: 'terrain',
+      styles: [{ featureType: 'poi', stylers: [{ visibility: 'off' }] }]
+    });
+
+    map.addListener('click', async (e) => {
+      if (!e.placeId && currentUser) {
+        const lat = e.latLng.lat();
+        const lng = e.latLng.lng();
+        const city = await reverseGeocode(lat, lng);
+        openSpotModal(null, { lat, lng, city });
+      } else if (!currentUser) {
+        document.getElementById('auth-modal').classList.add('open');
+      }
+    });
+  }
 
   // Auth
   supabase.auth.getSession().then(({ data: { session } }) => {
@@ -146,27 +159,37 @@
       el.addEventListener('click', () => {
         const spot = spots.find(s => s.id === el.dataset.id);
         if (spot) {
-          map.setView([spot.lat, spot.lng], 12);
+          map.panTo({ lat: spot.lat, lng: spot.lng });
+          map.setZoom(12);
           const m = markers.find(x => x.spot?.id === spot.id);
-          if (m?.marker) m.marker.openPopup();
+          if (m?.infoWindow) m.infoWindow.open(map, m.marker);
         }
       });
     });
   }
 
   function renderMarkers() {
-    markers.forEach(m => { if (m.marker) map.removeLayer(m.marker); });
+    markers.forEach(m => {
+      if (m.marker) m.marker.setMap(null);
+      if (m.infoWindow) m.infoWindow.close();
+    });
     markers = [];
     const filtered = currentFilter === 'all' ? spots : spots.filter(s => s.category === currentFilter);
     filtered.forEach(spot => {
-      const icon = L.divIcon({
-        className: 'custom-marker',
-        html: `<span style="font-size:1.2rem">${CATEGORIES[spot.category]?.icon || '📍'}</span>`,
-        iconSize: [24, 24],
-        iconAnchor: [12, 12]
+      const marker = new google.maps.Marker({
+        position: { lat: spot.lat, lng: spot.lng },
+        map,
+        label: { text: CATEGORIES[spot.category]?.icon || '📍', color: '#333', fontSize: '16px' },
+        icon: {
+          path: google.maps.SymbolPath.CIRCLE,
+          scale: 14,
+          fillColor: '#FF5A2D',
+          fillOpacity: 0.95,
+          strokeColor: '#D14A22',
+          strokeWeight: 2
+        }
       });
-      const marker = L.marker([spot.lat, spot.lng], { icon }).addTo(map);
-      marker.bindPopup(`
+      const content = `
         <div class="popup-content">
           <h3>${escapeHtml(spot.name)}</h3>
           <div class="category">${CATEGORIES[spot.category]?.icon || ''} ${CATEGORIES[spot.category]?.label || spot.category}</div>
@@ -181,15 +204,13 @@
             </div>
           ` : ''}
         </div>
-      `);
-      marker.on('popupopen', () => {
-        const pop = marker.getPopup().getElement();
-        if (pop) {
-          pop.querySelector('.btn-edit')?.addEventListener('click', () => { openSpotModal(spot); marker.closePopup(); });
-          pop.querySelector('.btn-delete')?.addEventListener('click', () => { deleteSpot(spot.id); marker.closePopup(); });
-        }
+      `;
+      const infoWindow = new google.maps.InfoWindow({ content });
+      marker.addListener('click', () => {
+        markers.forEach(m => m.infoWindow?.close());
+        infoWindow.open(map, marker);
       });
-      markers.push({ spot, marker });
+      markers.push({ spot, marker, infoWindow });
     });
   }
 
@@ -203,12 +224,17 @@
   async function reverseGeocode(lat, lng) {
     try {
       const res = await fetch(
-        `https://nominatim.openstreetmap.org/reverse?lat=${lat}&lon=${lng}&format=json`,
-        { headers: { 'User-Agent': 'OpenClawHub/1.0' } }
+        `https://maps.googleapis.com/maps/api/geocode/json?latlng=${lat},${lng}&key=${encodeURIComponent(googleMapsKey)}`
       );
       const data = await res.json();
-      const a = data?.address || {};
-      return a.city || a.town || a.village || a.municipality || a.county || a.state || data?.display_name?.split(',')[0] || '';
+      if (data.status !== 'OK' || !data.results?.length) return '';
+      const addr = data.results[0].address_components || [];
+      const types = ['locality', 'sublocality', 'administrative_area_level_2', 'administrative_area_level_1'];
+      for (const t of types) {
+        const c = addr.find(x => x.types.includes(t));
+        if (c) return c.long_name;
+      }
+      return data.results[0].formatted_address?.split(',')[0] || '';
     } catch (_) {
       return '';
     }
@@ -225,7 +251,7 @@
     });
   });
 
-  // Add spot button: focus map, show hint
+  // Add spot button
   document.getElementById('btn-add').addEventListener('click', () => {
     if (!currentUser) {
       document.getElementById('auth-modal').classList.add('open');
@@ -341,6 +367,26 @@
     loadSpots();
   });
 
+  document.body.addEventListener('click', (e) => {
+    const editBtn = e.target.closest('.btn-edit[data-id]');
+    if (editBtn) {
+      const spot = spots.find(s => s.id === editBtn.dataset.id);
+      if (spot) {
+        const m = markers.find(x => x.spot?.id === spot.id);
+        if (m) m.infoWindow?.close();
+        openSpotModal(spot);
+      }
+      return;
+    }
+    const delBtn = e.target.closest('.btn-delete[data-id]');
+    if (delBtn) {
+      const id = delBtn.dataset.id;
+      const m = markers.find(x => x.spot?.id === id);
+      if (m) m.infoWindow?.close();
+      deleteSpot(id);
+    }
+  });
+
   async function deleteSpot(id) {
     if (!confirm('Delete this spot?')) return;
     const { error } = await supabase.from('spots').delete().eq('id', id).eq('created_by', currentUser.id);
@@ -348,9 +394,18 @@
     loadSpots();
   }
 
-  loadSpots().then(() => {
-    document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
-    const activeBtn = document.querySelector(`.filter-btn[data-filter="${currentFilter}"]`);
-    if (activeBtn) activeBtn.classList.add('active');
-  });
+  loadGoogleMaps()
+    .then(() => {
+      initMap();
+      return loadSpots();
+    })
+    .then(() => {
+      document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
+      const activeBtn = document.querySelector(`.filter-btn[data-filter="${currentFilter}"]`);
+      if (activeBtn) activeBtn.classList.add('active');
+    })
+    .catch(err => {
+      console.error(err);
+      document.getElementById('map').innerHTML = '<div style="padding:2rem;text-align:center;color:#e74c3c">Failed to load map. Check your API key and enabled APIs.</div>';
+    });
 })();

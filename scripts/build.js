@@ -5,13 +5,13 @@ const path = require('path');
 
 const supabaseUrl = process.env.VITE_SUPABASE_URL || process.env.SUPABASE_URL || '';
 const supabaseAnonKey = process.env.VITE_SUPABASE_ANON_KEY || process.env.SUPABASE_ANON_KEY || '';
-const stadiaApiKey = process.env.VITE_STADIA_API_KEY || process.env.STADIA_API_KEY || '';
+const googleMapsApiKey = process.env.VITE_GOOGLE_MAPS_API_KEY || process.env.GOOGLE_MAPS_API_KEY || '';
 
-const config = `// Auto-generated - do not edit. Use env vars: VITE_SUPABASE_URL, VITE_SUPABASE_ANON_KEY, VITE_STADIA_API_KEY
+const config = `// Auto-generated - do not edit. Use env vars: VITE_SUPABASE_URL, VITE_SUPABASE_ANON_KEY, VITE_GOOGLE_MAPS_API_KEY
 window.OPENCLAW_CONFIG = {
   supabaseUrl: "${supabaseUrl}",
   supabaseAnonKey: "${supabaseAnonKey}",
-  stadiaApiKey: "${stadiaApiKey}"
+  googleMapsApiKey: "${googleMapsApiKey}"
 };
 `;
 
