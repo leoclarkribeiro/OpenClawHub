@@ -36,7 +36,7 @@ export VITE_SUPABASE_ANON_KEY="your-anon-key"
 npm run build
 ```
 
-Or use the existing `config.js`. Add your Google Maps API key to `googleMapsApiKey` for the map to load.
+Or copy `config.example.js` to `config.js` and add your Google Maps API key. (`config.js` is gitignored.)
 
 ```bash
 python3 -m http.server 8080
