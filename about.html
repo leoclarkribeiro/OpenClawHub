@@ -22,6 +22,7 @@
     }
     * { margin: 0; padding: 0; box-sizing: border-box; }
     body { font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif; background: var(--bg-dark); color: var(--text); min-height: 100vh; line-height: 1.6; }
+    body { padding-left: 220px; }
     .container { max-width: 720px; margin: 0 auto; padding: 3rem 1.5rem; }
     header { text-align: center; margin-bottom: 3rem; }
     .logo { font-size: 2.5rem; margin-bottom: 0.5rem; }
@@ -46,6 +47,39 @@
     .page-header { position: fixed; top: 0; left: 0; right: 0; z-index: 100; background: var(--bg-card); border-bottom: 1px solid rgba(255, 90, 45, 0.2); padding: 0.6rem 1rem; }
     .page-header a { color: var(--accent); text-decoration: none; font-family: 'JetBrains Mono', monospace; font-size: 0.85rem; }
     .page-header a:hover { color: var(--accent-bright); }
+    .nav-menu {
+      position: fixed;
+      top: 52px;
+      left: 0;
+      width: 220px;
+      height: calc(100vh - 52px);
+      background: var(--bg-card);
+      border-right: 1px solid rgba(255, 90, 45, 0.2);
+      z-index: 400;
+      padding: 0.75rem 0;
+      overflow-y: auto;
+    }
+    .nav-menu a {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 0.35rem 0.75rem;
+      font-size: 0.8rem;
+      color: var(--text-muted);
+      text-decoration: none;
+      transition: color 0.15s, background 0.15s;
+    }
+    .nav-menu a:hover { color: var(--text); background: rgba(255, 90, 45, 0.06); }
+    .nav-menu .menu-item-text { flex: 1; min-width: 0; }
+    @media (max-width: 900px) {
+      .nav-menu { width: 180px; }
+      body { padding-left: 180px; }
+    }
+    @media (max-width: 640px) {
+      .nav-menu { width: 100%; height: auto; position: relative; top: 52px; border-right: none; border-bottom: 1px solid rgba(255, 90, 45, 0.2); display: flex; flex-wrap: wrap; gap: 0.25rem; padding: 0.5rem; }
+      .nav-menu a { padding: 0.3rem 0.5rem; }
+      body { padding-left: 0; }
+    }
   </style>
   <script>window.va = window.va || function () { (window.vaq = window.vaq || []).push(arguments); };</script>
   <script defer src="/_vercel/insights/script.js"></script>
@@ -55,11 +89,15 @@
 <body>
   <header class="page-header">
     <a href="index.html">← Map</a>
-    <a href="index.html?filter=meetup" style="margin-left:1rem">Communities</a>
-    <a href="help.html" style="margin-left:0.5rem">Help & skills</a>
-    <a href="creations.html" style="margin-left:0.5rem">Creations</a>
-    <a href="calendar.html" style="margin-left:0.5rem">Calendar</a>
   </header>
+  <nav class="nav-menu" role="navigation" aria-label="Main navigation">
+    <a href="index.html"><span class="menu-item-text">Browse the OpenClaw Hub map</span></a>
+    <a href="index.html?filter=meetup"><span class="menu-item-text">Create / Join your local community</span></a>
+    <a href="help.html"><span class="menu-item-text">Help & skills</span></a>
+    <a href="creations.html"><span class="menu-item-text">Show your creations</span></a>
+    <a href="calendar.html"><span class="menu-item-text">Events calendar</span></a>
+    <a href="about.html"><span class="menu-item-text">About</span></a>
+  </nav>
   <div class="container" style="padding-top: 4rem;">
     <header>
       <div class="logo">🦞</div>

@@ -25,6 +25,7 @@ Sign in (email/password) to add content. Anyone can browse.
 1. Run the SQL in `supabase/schema.sql` in your Supabase project's SQL Editor (includes spots, help_skills, creations tables and event_date column).
 2. Create a Storage bucket named `spot-images` (Public: Yes) in Dashboard → Storage.
 3. Run `supabase/storage-policies.sql` in the SQL Editor to add upload and read policies.
+4. (Optional) For Stamen Terrain map tiles: sign up at [Stadia Maps](https://stadiamaps.com/) (free), get an API key, and add `VITE_STADIA_API_KEY` to Vercel env vars or `stadiaApiKey` in config.js.
 
 ### 2. Local development
 
