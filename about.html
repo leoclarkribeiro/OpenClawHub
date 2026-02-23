@@ -1,0 +1,89 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>About – OpenClaw Hub</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;600&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --muted: #8B7F77;
+      --accent: #FF5A2D;
+      --accent-bright: #FF7A3D;
+      --accent-dim: #D14A22;
+      --success: #2FBF71;
+      --info: #FF8A5B;
+      --bg-dark: #0d0c0b;
+      --bg-card: #161412;
+      --text: #e8e4e0;
+      --text-muted: #8B7F77;
+    }
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body { font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif; background: var(--bg-dark); color: var(--text); min-height: 100vh; line-height: 1.6; }
+    .container { max-width: 720px; margin: 0 auto; padding: 3rem 1.5rem; }
+    header { text-align: center; margin-bottom: 3rem; }
+    .logo { font-size: 2.5rem; margin-bottom: 0.5rem; }
+    h1 { font-family: 'JetBrains Mono', monospace; font-size: 1.75rem; font-weight: 600; color: var(--text); margin-bottom: 0.25rem; }
+    h1 .beta { font-size: 0.65rem; font-weight: 400; color: var(--muted); margin-left: 0.5rem; }
+    .tagline { color: var(--text-muted); font-size: 1rem; font-weight: 400; }
+    section { margin-bottom: 2.5rem; }
+    .section-label { font-family: 'JetBrains Mono', monospace; font-size: 0.875rem; color: var(--accent); margin-bottom: 1rem; display: flex; align-items: center; gap: 0.5rem; }
+    .section-label::before { content: '⟩'; color: var(--accent-dim); }
+    .card { background: var(--bg-card); border: 1px solid rgba(255, 90, 45, 0.12); border-radius: 12px; padding: 1.5rem; margin-bottom: 1rem; }
+    .card p { color: var(--text); font-size: 1rem; margin-bottom: 1rem; }
+    .card p:last-child { margin-bottom: 0; }
+    .card .highlight { color: var(--accent-bright); }
+    .cta-button { display: inline-flex; align-items: center; gap: 0.5rem; background: var(--accent); color: white; font-family: 'JetBrains Mono', monospace; font-size: 0.9375rem; font-weight: 500; padding: 0.75rem 1.25rem; border-radius: 8px; text-decoration: none; border: none; cursor: pointer; transition: background 0.2s, transform 0.15s; }
+    .cta-button:hover { background: var(--accent-bright); transform: translateY(-1px); }
+    .cta-button .external { font-size: 0.75rem; opacity: 0.9; }
+    .hub-intro { font-size: 1.125rem; color: var(--text); margin-bottom: 1rem; }
+    .hub-intro strong { color: var(--accent-bright); }
+    footer { margin-top: 3rem; padding-top: 2rem; border-top: 1px solid rgba(139, 127, 119, 0.2); text-align: center; color: var(--text-muted); font-size: 0.875rem; }
+    footer a { color: var(--accent-dim); text-decoration: none; }
+    footer a:hover { color: var(--accent); }
+    .page-header { position: fixed; top: 0; left: 0; right: 0; z-index: 100; background: var(--bg-card); border-bottom: 1px solid rgba(255, 90, 45, 0.2); padding: 0.6rem 1rem; }
+    .page-header a { color: var(--accent); text-decoration: none; font-family: 'JetBrains Mono', monospace; font-size: 0.85rem; }
+    .page-header a:hover { color: var(--accent-bright); }
+  </style>
+  <script>window.va = window.va || function () { (window.vaq = window.vaq || []).push(arguments); };</script>
+  <script defer src="/_vercel/insights/script.js"></script>
+  <script>window.si = window.si || function () { (window.siq = window.siq || []).push(arguments); };</script>
+  <script defer src="/_vercel/speed-insights/script.js"></script>
+</head>
+<body>
+  <header class="page-header">
+    <a href="index.html">← Map</a>
+    <a href="index.html?filter=meetup" style="margin-left:1rem">Communities</a>
+    <a href="help.html" style="margin-left:0.5rem">Help & skills</a>
+    <a href="creations.html" style="margin-left:0.5rem">Creations</a>
+    <a href="calendar.html" style="margin-left:0.5rem">Calendar</a>
+  </header>
+  <div class="container" style="padding-top: 4rem;">
+    <header>
+      <div class="logo">🦞</div>
+      <h1>OpenClaw Hub <span class="beta">Beta v0.2</span></h1>
+      <p class="tagline">Where human lobsters connect. Stay Crusty!</p>
+    </header>
+    <section>
+      <h2 class="section-label">What is OpenClaw?</h2>
+      <div class="card">
+        <p><strong class="highlight">OpenClaw</strong> is a personal AI assistant that actually does things. It clears your inbox, sends emails, manages your calendar, checks you in for flights, all from WhatsApp, Telegram, Discord, or any chat app you already use.</p>
+        <p>It runs on <em>your</em> machine (Mac, Windows, or Linux), remembers you with persistent memory, and can browse the web, run commands, and extend itself with skills. Your data stays yours. It's open source, hackable, and built by a growing community.</p>
+        <p><a href="https://openclaw.ai/" target="_blank" rel="noopener noreferrer" class="cta-button">Get OpenClaw <span class="external">↗</span></a></p>
+      </div>
+    </section>
+    <section>
+      <h2 class="section-label">What is OpenClaw Hub?</h2>
+      <div class="card">
+        <p class="hub-intro"><strong>OpenClaw Hub</strong> is where human lobsters connect, share experiences, get help and explore the future of personal AI assistants. Plus, organize and join local meetups. <a href="index.html">Browse the map</a> to find spots near you.</p>
+      </div>
+    </section>
+    <footer>
+      <p>Not affiliated with OpenClaw. Built for the community. 🦞</p>
+      <p style="margin-top: 0.5rem;"><a href="https://openclaw.ai/" target="_blank" rel="noopener noreferrer">openclaw.ai</a></p>
+    </footer>
+  </div>
+</body>
+</html>

@@ -43,7 +43,7 @@
 
     const list = document.getElementById('events-list');
     list.innerHTML = (withDate.length + noDate.length) === 0
-      ? '<p style="color:var(--muted);font-size:0.9rem">No meetup events this month. <a href="map.html">Add one on the map</a>!</p>'
+      ? '<p style="color:var(--muted);font-size:0.9rem">No meetup events this month. <a href="index.html">Add one on the map</a>!</p>'
       : [
           ...withDate.map(e => `
             <div class="event-card">
@@ -51,7 +51,7 @@
               <h3>${escapeHtml(e.name)}</h3>
               ${e.description ? `<p>${escapeHtml(e.description)}</p>` : ''}
               <div class="city">📍 ${escapeHtml(e.city)}</div>
-              <a href="map.html?filter=meetup" style="display:inline-block;margin-top:0.5rem">View on map →</a>
+              <a href="index.html?filter=meetup" style="display:inline-block;margin-top:0.5rem">View on map →</a>
             </div>
           `),
           ...noDate.map(e => `
@@ -60,7 +60,7 @@
               <h3>${escapeHtml(e.name)}</h3>
               ${e.description ? `<p>${escapeHtml(e.description)}</p>` : ''}
               <div class="city">📍 ${escapeHtml(e.city)}</div>
-              <a href="map.html?filter=meetup" style="display:inline-block;margin-top:0.5rem">View on map →</a>
+              <a href="index.html?filter=meetup" style="display:inline-block;margin-top:0.5rem">View on map →</a>
             </div>
           `)
         ].join('');

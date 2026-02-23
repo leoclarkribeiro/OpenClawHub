@@ -2,7 +2,7 @@
 
 Where human lobsters connect. Stay Crusty!
 
-OpenClaw Hub is where human lobsters connect, share experiences, get help and explore the future of personal AI assistants. Plus, organize and join local meetups. [Browse the map](map.html) to find spots near you.
+OpenClaw Hub is where human lobsters connect, share experiences, get help and explore the future of personal AI assistants. Plus, organize and join local meetups. [Browse the map](index.html) to find spots near you.
 
 ## What is OpenClaw?
 
@@ -10,8 +10,8 @@ OpenClaw Hub is where human lobsters connect, share experiences, get help and ex
 
 ## Features
 
-- **[Map](map.html)** – Browse, add, edit spots (lobsters, meetups, businesses). Click on map to add.
-- **[Create / Join community](map.html?filter=meetup)** – Find or add meetup spots.
+- **[Map](index.html)** – Browse, add, edit spots (lobsters, meetups, businesses). Click on map to add.
+- **[Create / Join community](index.html?filter=meetup)** – Find or add meetup spots.
 - **[Help & skills](help.html)** – Ask for help, offer services, post bounties.
 - **[Show your creations](creations.html)** – Gallery of community projects.
 - **[Events calendar](calendar.html)** – Meetup events by date.
