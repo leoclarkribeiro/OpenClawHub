@@ -1,8 +1,8 @@
-# Open Claw Map
+# OpenClaw Map
 
 Where human lobsters connect. Stay Crusty!
 
-Open Claw Map is where human lobsters connect, share experiences, get help and explore the future of personal AI assistants. Plus, organize and join local meetups. [Browse the map](index.html) to find spots near you.
+OpenClaw Map is where human lobsters connect, share experiences, get help and explore the future of personal AI assistants. Plus, organize and join local meetups. [Browse the map](index.html) to find spots near you.
 
 ## What is OpenClaw?
 

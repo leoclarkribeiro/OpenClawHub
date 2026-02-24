@@ -1,4 +1,4 @@
--- Open Claw Map - Supabase Schema
+-- OpenClaw Map - Supabase Schema
 -- Run this in Supabase SQL Editor: https://supabase.com/dashboard/project/_/sql
 
 -- Categories: lobster (Human Lobster/Builder), meetup (Meetup & IRL Event), business (Business)
