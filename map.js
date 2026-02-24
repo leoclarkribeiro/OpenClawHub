@@ -353,23 +353,31 @@
     return div.innerHTML;
   }
 
-  async function reverseGeocode(lat, lng) {
-    try {
-      const res = await fetch(
-        `https://maps.googleapis.com/maps/api/geocode/json?latlng=${lat},${lng}&key=${encodeURIComponent(googleMapsKey)}`
-      );
-      const data = await res.json();
-      if (data.status !== 'OK' || !data.results?.length) return '';
-      const addr = data.results[0].address_components || [];
-      const types = ['locality', 'sublocality', 'administrative_area_level_2', 'administrative_area_level_1'];
-      for (const t of types) {
-        const c = addr.find(x => x.types.includes(t));
-        if (c) return c.long_name;
+  function reverseGeocode(lat, lng) {
+    return new Promise((resolve) => {
+      if (!window.google?.maps?.Geocoder) {
+        resolve('');
+        return;
       }
-      return data.results[0].formatted_address?.split(',')[0] || '';
-    } catch (_) {
-      return '';
-    }
+      const geocoder = new google.maps.Geocoder();
+      geocoder.geocode({ location: { lat, lng } }, (results, status) => {
+        if (status !== 'OK' || !results?.length) {
+          resolve('');
+          return;
+        }
+        const addr = results[0].address_components || [];
+        const types = ['locality', 'sublocality', 'administrative_area_level_2', 'administrative_area_level_1', 'country'];
+        for (const t of types) {
+          const c = addr.find(x => x.types.includes(t));
+          if (c) {
+            resolve(c.long_name.trim());
+            return;
+          }
+        }
+        const formatted = results[0].formatted_address;
+        resolve(formatted ? formatted.split(',')[0].trim() : '');
+      });
+    });
   }
 
   // Filter
