@@ -21,7 +21,7 @@
     business: { label: 'Business', icon: '💰' }
   };
 
-  let map, markers = [], currentFilter = 'all', spots = [], currentUser = null;
+  let map, markers = [], currentFilter = 'all', spots = [], currentUser = null, pendingClick = null;
 
   const params = new URLSearchParams(window.location.search);
   if (params.get('filter') === 'meetup') currentFilter = 'meetup';
@@ -82,6 +82,9 @@
         const city = await reverseGeocode(lat, lng);
         openSpotModal(null, { lat, lng, city });
       } else if (!currentUser) {
+        const lat = e.latLng.lat();
+        const lng = e.latLng.lng();
+        pendingClick = { lat, lng, city: await reverseGeocode(lat, lng) };
         document.getElementById('auth-modal').classList.add('open');
       }
     });
@@ -101,25 +104,79 @@
     const status = document.getElementById('auth-status');
     const btnAuth = document.getElementById('btn-auth');
     const btnAdd = document.getElementById('btn-add');
+    const linkCreate = document.getElementById('link-create-account');
     if (currentUser) {
-      status.innerHTML = '<span class="user-email">' + currentUser.email + '</span>';
+      const isAnonymous = currentUser.is_anonymous;
+      status.innerHTML = isAnonymous
+        ? '<span class="user-email">Guest</span>'
+        : '<span class="user-email">' + (currentUser.email || '') + '</span>';
+      linkCreate.style.display = isAnonymous ? 'inline-block' : 'none';
       btnAuth.textContent = 'Sign out';
       btnAuth.style.display = 'inline-block';
       btnAdd.style.display = 'inline-block';
+      if (isAnonymous && currentUser.email_confirmed_at) {
+        openLinkAccountModal('password');
+      }
     } else {
       status.innerHTML = '';
+      linkCreate.style.display = 'none';
       btnAuth.textContent = 'Sign in';
       btnAuth.style.display = 'inline-block';
       btnAdd.style.display = 'none';
     }
   }
 
+  function openLinkAccountModal(step) {
+    const modal = document.getElementById('link-account-modal');
+    const stepEmail = document.getElementById('link-account-step-email');
+    const stepSent = document.getElementById('link-account-step-sent');
+    const stepPassword = document.getElementById('link-account-step-password');
+    stepEmail.style.display = 'none';
+    stepSent.style.display = 'none';
+    stepPassword.style.display = 'none';
+    document.getElementById('link-account-error').textContent = '';
+    document.getElementById('link-password-error').textContent = '';
+    if (step === 'password' || (currentUser?.is_anonymous && currentUser?.email_confirmed_at)) {
+      stepPassword.style.display = 'block';
+    } else {
+      stepEmail.style.display = 'block';
+    }
+    modal.classList.add('open');
+  }
+
+  function closeLinkAccountModal() {
+    document.getElementById('link-account-modal').classList.remove('open');
+  }
+
   document.getElementById('btn-auth').addEventListener('click', async () => {
     if (currentUser) {
       await supabase.auth.signOut();
     } else {
+      pendingClick = null;
+      document.getElementById('auth-section').style.display = 'none';
+      document.getElementById('auth-error').textContent = '';
       document.getElementById('auth-modal').classList.add('open');
     }
+  });
+
+  document.getElementById('btn-guest').addEventListener('click', async () => {
+    const errEl = document.getElementById('auth-error');
+    errEl.textContent = '';
+    const { error } = await supabase.auth.signInAnonymously();
+    if (error) {
+      errEl.textContent = error.message || 'Guest sign-in failed. Try Sign in / Create account.';
+      return;
+    }
+    document.getElementById('auth-modal').classList.remove('open');
+    document.getElementById('auth-section').style.display = 'none';
+    if (pendingClick) {
+      openSpotModal(null, pendingClick);
+      pendingClick = null;
+    }
+  });
+
+  document.getElementById('btn-show-signin').addEventListener('click', () => {
+    document.getElementById('auth-section').style.display = 'block';
   });
 
   document.getElementById('btn-signin').addEventListener('click', async () => {
@@ -137,6 +194,11 @@
       return;
     }
     document.getElementById('auth-modal').classList.remove('open');
+    document.getElementById('auth-section').style.display = 'none';
+    if (pendingClick) {
+      openSpotModal(null, pendingClick);
+      pendingClick = null;
+    }
   });
 
   document.getElementById('btn-signup').addEventListener('click', async () => {
@@ -158,6 +220,55 @@
 
   document.getElementById('auth-modal').addEventListener('click', (e) => {
     if (e.target.id === 'auth-modal') e.target.classList.remove('open');
+  });
+
+  document.getElementById('link-create-account').addEventListener('click', (e) => {
+    e.preventDefault();
+    if (!currentUser?.is_anonymous) return;
+    openLinkAccountModal(currentUser.email_confirmed_at ? 'password' : 'email');
+  });
+
+  document.getElementById('btn-link-send').addEventListener('click', async () => {
+    const email = document.getElementById('link-email').value.trim();
+    const errEl = document.getElementById('link-account-error');
+    errEl.textContent = '';
+    if (!email) {
+      errEl.textContent = 'Enter your email';
+      return;
+    }
+    const { error } = await supabase.auth.updateUser({ email });
+    if (error) {
+      errEl.textContent = error.message;
+      return;
+    }
+    document.getElementById('link-account-step-email').style.display = 'none';
+    document.getElementById('link-account-step-sent').style.display = 'block';
+  });
+
+  document.getElementById('btn-link-cancel').addEventListener('click', closeLinkAccountModal);
+  document.getElementById('btn-link-close-sent').addEventListener('click', closeLinkAccountModal);
+
+  document.getElementById('btn-link-set-password').addEventListener('click', async () => {
+    const password = document.getElementById('link-password').value;
+    const errEl = document.getElementById('link-password-error');
+    errEl.textContent = '';
+    if (!password || password.length < 6) {
+      errEl.textContent = 'Password must be at least 6 characters';
+      return;
+    }
+    const { error } = await supabase.auth.updateUser({ password });
+    if (error) {
+      errEl.textContent = error.message;
+      return;
+    }
+    closeLinkAccountModal();
+    updateAuthUI();
+  });
+
+  document.getElementById('btn-link-cancel-pw').addEventListener('click', closeLinkAccountModal);
+
+  document.getElementById('link-account-modal').addEventListener('click', (e) => {
+    if (e.target.id === 'link-account-modal') closeLinkAccountModal();
   });
 
   // Load spots

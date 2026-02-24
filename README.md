@@ -16,7 +16,7 @@ OpenClaw Map is where human lobsters connect, share experiences, get help and ex
 - **[Show your creations](creations.html)** – Gallery of community projects.
 - **[Events calendar](calendar.html)** – Meetup events by date.
 
-Sign in (email/password) to add content. Anyone can browse.
+Add spots as a guest (no signup) or sign in to create an account. Anyone can browse.
 
 ## Setup
 
@@ -25,7 +25,10 @@ Sign in (email/password) to add content. Anyone can browse.
 1. Run the SQL in `supabase/schema.sql` in your Supabase project's SQL Editor (includes spots, help_skills, creations tables and event_date column).
 2. Create a Storage bucket named `spot-images` (Public: Yes) in Dashboard → Storage.
 3. Run `supabase/storage-policies.sql` in the SQL Editor to add upload and read policies.
-4. **Google Maps**: Enable Maps JavaScript API and Geocoding API in [Google Cloud Console](https://console.cloud.google.com/). Add your API key to `config.js` as `googleMapsApiKey`, or set `VITE_GOOGLE_MAPS_API_KEY` for Vercel builds. Restrict the key by HTTP referrer in production.
+4. **Anonymous Auth**: In Supabase Dashboard → Authentication → Providers → enable **Anonymous** (allows "Add as guest" without signup).
+5. **Manual Linking** (for converting guests to accounts): In Supabase Dashboard → Authentication → Providers → enable **Manual linking** (or set `GOTRUE_SECURITY_MANUAL_LINKING_ENABLED: true` when self-hosting). This lets guests link an email and convert to a permanent account while keeping their spots.
+6. **Redirect URLs**: In Supabase Dashboard → Authentication → URL Configuration → Redirect URLs, add your site URLs (e.g. `https://www.openclawmap.wtf`, `http://localhost:8080`) so email verification links redirect correctly.
+7. **Google Maps**: Enable Maps JavaScript API and Geocoding API in [Google Cloud Console](https://console.cloud.google.com/). Add your API key to `config.js` as `googleMapsApiKey`, or set `VITE_GOOGLE_MAPS_API_KEY` for Vercel builds. Restrict the key by HTTP referrer in production.
 
 ### 2. Local development
 
