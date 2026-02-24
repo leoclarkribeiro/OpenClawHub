@@ -74,7 +74,7 @@
       ? '<p style="color:var(--muted);font-size:0.9rem;grid-column:1/-1">No creations yet. Sign in to add one!</p>'
       : creations.map(c => {
           const imgEl = c.image_url
-            ? `<img src="${escapeHtml(c.image_url)}" alt="" loading="lazy">`
+            ? `<img src="${escapeHtml(c.image_url)}" alt="${escapeHtml(c.title)} – OpenClaw community creation" loading="lazy">`
             : '<span>🦞</span>';
           return `
             <div class="creation-card" data-id="${c.id}">

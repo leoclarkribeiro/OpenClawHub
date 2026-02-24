@@ -60,6 +60,7 @@ const PAGE_TEMPLATE = (opts) => `<!DOCTYPE html>
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>${escapeHtml(opts.title)}</title>
   <meta name="description" content="${escapeHtml(opts.description)}">
+  ${opts.schemaScript || ''}
   <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🦞</text></svg>">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -208,11 +209,25 @@ async function main() {
     if (!cat || catSpots.length === 0) continue;
     const slug = cat.slug;
     const content = `<h1>${cat.icon} ${escapeHtml(cat.label)}</h1><p>Browse ${catSpots.length} ${cat.label.toLowerCase()} on the OpenClaw Map.</p><ul class="spot-list">${catSpots.map(s => renderSpotItem(s, '')).join('')}</ul>`;
+    const itemType = catKey === 'lobster' ? 'Person' : catKey === 'business' ? 'LocalBusiness' : 'Event';
+    const itemListSchema = {
+      '@context': 'https://schema.org',
+      '@type': 'ItemList',
+      name: `OpenClaw Map – ${cat.label}`,
+      numberOfItems: catSpots.length,
+      itemListElement: catSpots.slice(0, 50).map((s, i) => ({
+        '@type': 'ListItem',
+        position: i + 1,
+        item: { '@type': itemType, name: s.name, ...(s.city && { address: { '@type': 'PostalAddress', addressLocality: s.city } }) }
+      }))
+    };
+    const schemaScript = `<script type="application/ld+json">${JSON.stringify(itemListSchema)}</script>`;
     const html = PAGE_TEMPLATE({
       title: `OpenClaw Map – ${cat.label}`,
       description: `Find ${cat.label.toLowerCase()} on the OpenClaw community map. Connect with builders and the Human Lobster community worldwide.`,
       content,
-      basePath: ''
+      basePath: '',
+      schemaScript
     });
     fs.writeFileSync(path.join(root, `${slug}.html`), html);
     sitemapUrls.push({ loc: `${BASE_URL}/${slug}.html`, changefreq: 'weekly', priority: '0.8' });

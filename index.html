@@ -4,9 +4,9 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>OpenClaw Map | Global Community Map for Builders & Lobsters</title>
-  <meta name="description" content="Connect with fellow builders and Human Lobsters worldwide. Find local meetups, business spots, and community events on the OpenClaw interactive map.">
+  <meta name="description" content="Connect with fellow human lobsters. Find local builders, join IRL meetups, share skills, show creations & discover OpenClaw events in the OpenClaw community.">
   <script type="application/ld+json">
-  {"@context":"https://schema.org","@graph":[{"@type":"WebSite","name":"OpenClaw Map","url":"https://www.openclawmap.wtf","description":"Global community map for OpenClaw builders and Human Lobsters. Find local meetups, business spots, and community events."},{"@type":"Organization","name":"OpenClaw Map","url":"https://www.openclawmap.wtf","description":"Community map connecting OpenClaw builders worldwide"}]}
+  {"@context":"https://schema.org","@graph":[{"@type":"WebSite","name":"OpenClaw Map","url":"https://www.openclawmap.wtf","description":"Global community map for OpenClaw builders and Human Lobsters. Find local meetups, share skills, show creations, and discover OpenClaw events."},{"@type":"Organization","name":"OpenClaw Map","url":"https://www.openclawmap.wtf","description":"Community map connecting OpenClaw builders worldwide"}]}
   </script>
   <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🦞</text></svg>">
   <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -99,6 +99,7 @@
     .spot-card:hover { background: rgba(255, 90, 45, 0.08); }
     .spot-card h4 { font-size: 0.9rem; margin-bottom: 0.2rem; }
     .spot-card .meta { font-size: 0.75rem; color: var(--muted); }
+    .sidebar-intro { margin-bottom: 0.75rem; padding-bottom: 0.75rem; border-bottom: 1px solid rgba(139, 127, 119, 0.2); }
     .modal-overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.7); z-index: 2000; display: none; align-items: center; justify-content: center; padding: 1rem; }
     .modal-overlay.open { display: flex; }
     .modal { background: var(--bg-card); border: 1px solid rgba(255, 90, 45, 0.2); border-radius: 12px; padding: 1.5rem; max-width: 420px; width: 100%; max-height: 90vh; overflow-y: auto; }
@@ -160,6 +161,10 @@
   <div id="map"></div>
 
   <aside class="sidebar">
+    <div class="sidebar-intro">
+      <h2 style="font-size:0.95rem;margin-bottom:0.5rem;color:var(--accent)">Find Lobsters Near You</h2>
+      <p style="font-size:0.85rem;color:var(--text-muted);line-height:1.5;margin-bottom:0.75rem">OpenClaw Map is where human lobsters connect. Browse builders, meetups, and businesses on the interactive map. Add yourself to find collaborators, join IRL events, or discover the local OpenClaw community. <a href="about.html">Learn more</a> or <a href="index.html?filter=meetup">find meetups</a>.</p>
+    </div>
     <div class="filter-row">
       <button type="button" class="filter-btn active" data-filter="all">All</button>
       <button type="button" class="filter-btn" data-filter="lobster">🦞 Human Lobster / Builder</button>

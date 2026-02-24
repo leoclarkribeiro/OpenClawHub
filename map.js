@@ -328,7 +328,7 @@
           ${spot.event_date ? '<div style="font-size:0.8rem;color:var(--accent);margin:0.25rem 0">📅 ' + escapeHtml(new Date(spot.event_date + 'T12:00:00').toLocaleDateString()) + '</div>' : ''}
           ${spot.description ? '<p style="font-size:0.85rem;margin:0.25rem 0">' + escapeHtml(spot.description) + '</p>' : ''}
           <div class="city">📍 ${escapeHtml(spot.city)}</div>
-          ${spot.image_url ? '<img src="' + escapeHtml(spot.image_url) + '" style="max-width:100%;max-height:120px;border-radius:6px;margin-top:0.5rem" alt="">' : ''}
+          ${spot.image_url ? '<img src="' + escapeHtml(spot.image_url) + '" alt="' + escapeHtml(spot.name) + ' – OpenClaw map spot" style="max-width:100%;max-height:120px;border-radius:6px;margin-top:0.5rem" loading="lazy">' : ''}
           ${currentUser && spot.created_by === currentUser.id ? `
             <div style="margin-top:0.5rem;display:flex;gap:0.5rem">
               <button class="btn-edit" data-id="${spot.id}">Edit</button>
