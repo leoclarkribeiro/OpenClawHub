@@ -6,11 +6,31 @@
   let events = [];
   let currentView = new Date();
 
+  function injectEventSchema() {
+    const withDate = events.filter(e => e.event_date).slice(0, 20);
+    if (withDate.length === 0) return;
+    const schema = {
+      '@context': 'https://schema.org',
+      '@graph': withDate.map(e => ({
+        '@type': 'Event',
+        name: e.name,
+        description: e.description || undefined,
+        startDate: e.event_date,
+        location: { '@type': 'Place', name: e.city }
+      }))
+    };
+    const script = document.createElement('script');
+    script.type = 'application/ld+json';
+    script.textContent = JSON.stringify(schema);
+    document.head.appendChild(script);
+  }
+
   async function loadEvents() {
     const { data, error } = await supabase.from('spots').select('*').eq('category', 'meetup').order('event_date', { ascending: true, nullsFirst: false });
     if (error) { console.error(error); return; }
     events = data || [];
     render();
+    injectEventSchema();
   }
 
   function escapeHtml(s) {

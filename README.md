@@ -55,9 +55,16 @@ Add these environment variables in Vercel:
 - `VITE_SUPABASE_ANON_KEY` – Your Supabase anon (public) key
 - `VITE_GOOGLE_MAPS_API_KEY` – Your Google Maps API key (Maps JavaScript API + Geocoding API)
 
-The build step generates `config.js` from these env vars.
+The build step generates `config.js` from these env vars. It also runs `scripts/generate-seo-pages.js`, which fetches spots from Supabase and generates static location pages (`locations/[city].html`) and category pages (`builders.html`, `meetups.html`, `businesses.html`) for SEO.
 
-### 4. Custom domains (Vercel)
+### 4. SEO
+
+- **Sitemap**: `sitemap.xml` is generated at build time. Submit `https://www.openclawmap.wtf/sitemap.xml` to [Google Search Console](https://search.google.com/search-console).
+- **robots.txt**: References the sitemap. Ensure it's accessible at `/robots.txt`.
+- **Schema markup**: WebSite, Organization (index), Event (calendar). Events are injected client-side when the calendar loads.
+- **Static pages**: Location and category pages are plain HTML with crawlable text. Update `BASE_URL` in `scripts/generate-seo-pages.js` if your domain differs.
+
+### 5. Custom domains (Vercel)
 
 1. In Vercel Dashboard → Project → **Settings** → **Domains**
 2. Add `www.openclawmap.wtf` – Vercel will show DNS records (CNAME to `cname.vercel-dns.com`)

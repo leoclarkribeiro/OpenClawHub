@@ -3,7 +3,7 @@
   "version": "1.0.0",
   "private": true,
   "scripts": {
-    "build": "node scripts/build.js"
+    "build": "node scripts/build.js && node scripts/generate-seo-pages.js"
   },
   "dependencies": {
     "@vercel/analytics": "^1.6.1",
