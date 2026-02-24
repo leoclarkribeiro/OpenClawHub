@@ -1,8 +1,8 @@
-# OpenClaw Hub
+# Open Claw Map
 
 Where human lobsters connect. Stay Crusty!
 
-OpenClaw Hub is where human lobsters connect, share experiences, get help and explore the future of personal AI assistants. Plus, organize and join local meetups. [Browse the map](index.html) to find spots near you.
+Open Claw Map is where human lobsters connect, share experiences, get help and explore the future of personal AI assistants. Plus, organize and join local meetups. [Browse the map](index.html) to find spots near you.
 
 ## What is OpenClaw?
 
@@ -53,6 +53,16 @@ Add these environment variables in Vercel:
 - `VITE_GOOGLE_MAPS_API_KEY` – Your Google Maps API key (Maps JavaScript API + Geocoding API)
 
 The build step generates `config.js` from these env vars.
+
+### 4. Custom domains (Vercel)
+
+1. In Vercel Dashboard → Project → **Settings** → **Domains**
+2. Add `www.openclawmap.wtf` – Vercel will show DNS records (CNAME to `cname.vercel-dns.com`)
+3. In your domain registrar (e.g. Namecheap, Cloudflare), add the CNAME record for `www` → `cname.vercel-dns.com`
+4. Set `www.openclawmap.wtf` as the **primary** domain (Vercel → Domains → ⋮ next to domain → "Set as Primary")
+5. Keep `www.openclawhub.wtf` if desired – add it as an alias; both will point to the same deployment
+
+**Google Maps API key:** Add `www.openclawmap.wtf/*` and `*.openclawmap.wtf/*` to HTTP referrer restrictions in Google Cloud Console.
 
 ## Links
 
