@@ -31,6 +31,19 @@ function slugify(s) {
     .replace(/^-|-$/g, '') || 'unknown';
 }
 
+/** Normalize city for grouping: "San Francisco, CA" → "San Francisco". Produces cleaner slugs. */
+function primaryCity(city) {
+  if (!city || typeof city !== 'string') return 'Unknown';
+  const trimmed = city.trim();
+  const commaIdx = trimmed.indexOf(',');
+  if (commaIdx > 0) return trimmed.slice(0, commaIdx).trim();
+  if (/\b(bay area|metro|greater)\b/i.test(trimmed)) {
+    const m = trimmed.match(/^(.+?)\s+(bay area|metro|greater)/i);
+    if (m) return m[1].trim();
+  }
+  return trimmed || 'Unknown';
+}
+
 function escapeHtml(s) {
   if (!s) return '';
   return String(s)
@@ -145,7 +158,8 @@ async function main() {
   const byCategory = { lobster: [], meetup: [], business: [] };
 
   for (const s of spots) {
-    const city = (s.city || '').trim() || 'Unknown';
+    const rawCity = (s.city || '').trim() || 'Unknown';
+    const city = primaryCity(rawCity);
     if (!byCity[city]) byCity[city] = [];
     byCity[city].push(s);
     if (byCategory[s.category]) byCategory[s.category].push(s);
