@@ -60,6 +60,7 @@ const PAGE_TEMPLATE = (opts) => `<!DOCTYPE html>
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>${escapeHtml(opts.title)}</title>
   <meta name="description" content="${escapeHtml(opts.description)}">
+  <link rel="canonical" href="${escapeHtml(opts.canonicalUrl || BASE_URL + '/')}">
   ${opts.schemaScript || ''}
   <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🦞</text></svg>">
   <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -198,7 +199,8 @@ async function main() {
       title: `OpenClaw Map – ${city} | Builders, Meetups & Businesses`,
       description: `Find OpenClaw builders, meetups, and businesses in ${city}. Connect with the Human Lobster community.`,
       content,
-      basePath: '../'
+      basePath: '../',
+      canonicalUrl: `${BASE_URL}/locations/${slug}.html`
     });
     fs.writeFileSync(path.join(locationsDir, `${slug}.html`), html);
     sitemapUrls.push({ loc: `${BASE_URL}/locations/${slug}.html`, changefreq: 'weekly', priority: '0.7' });
@@ -227,7 +229,8 @@ async function main() {
       description: `Find ${cat.label.toLowerCase()} on the OpenClaw community map. Connect with builders and the Human Lobster community worldwide.`,
       content,
       basePath: '',
-      schemaScript
+      schemaScript,
+      canonicalUrl: `${BASE_URL}/${slug}.html`
     });
     fs.writeFileSync(path.join(root, `${slug}.html`), html);
     sitemapUrls.push({ loc: `${BASE_URL}/${slug}.html`, changefreq: 'weekly', priority: '0.8' });
