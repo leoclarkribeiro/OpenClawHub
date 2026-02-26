@@ -95,7 +95,7 @@ const PAGE_TEMPLATE = (opts) => `<!DOCTYPE html>
 <body>
   <header class="page-header">
     <div><button type="button" class="menu-trigger" id="menu-trigger" aria-expanded="false">☰ Menu</button></div>
-    <h1 class="header-center">🦞 OpenClaw Map <span class="beta">Beta v0.5</span></h1>
+    <h1 class="header-center">🦞 OpenClaw Map <span class="beta">Beta v0.6</span></h1>
     <div>    <a href="${opts.basePath}index.html">Map</a></div>
   </header>
   <div class="menu-overlay" id="menu-overlay"></div>

@@ -121,8 +121,20 @@
       .sidebar { width: 240px; }
     }
     @media (max-width: 640px) {
-      .sidebar { width: 100%; max-height: 35vh; top: auto; bottom: 0; border-left: none; border-top: 1px solid rgba(255, 90, 45, 0.2); }
-      #map { left: 0; right: 0; bottom: 35vh; height: calc(65vh - 52px); }
+      .map-header { padding: 0.5rem 0.75rem; grid-template-columns: auto 1fr auto; gap: 0.5rem; }
+      .map-header h1 { font-size: 0.85rem; line-height: 1.3; text-align: center; }
+      .map-header h1 .beta { display: block; margin-left: 0; margin-top: 0.2rem; }
+      .map-header h1 .hide-mobile { display: none; }
+      .sidebar { width: 100%; max-height: 38vh; top: auto; bottom: 0; border-left: none; border-top: 1px solid rgba(255, 90, 45, 0.2); padding: 1rem; overflow-y: auto; }
+      #map { left: 0; right: 0; bottom: 38vh; height: calc(62vh - 52px); }
+      .sidebar-intro { margin-bottom: 1rem; padding-bottom: 1rem; }
+      .sidebar-intro h2 { font-size: 1rem; margin-bottom: 0.6rem; }
+      .sidebar-intro p { font-size: 0.9rem; line-height: 1.6; margin-bottom: 0.6rem; }
+      .sidebar-intro .intro-links { display: flex; flex-direction: column; gap: 0.35rem; }
+      .sidebar-intro .link-sep { display: none; }
+      .filter-row { flex-direction: column; gap: 0.5rem; margin-bottom: 1rem; }
+      .filter-btn { width: 100%; justify-content: center; padding: 0.5rem 0.75rem; font-size: 0.8rem; }
+      .spot-card { padding: 0.75rem; margin-bottom: 0.6rem; }
     }
   </style>
   <script>
@@ -141,7 +153,7 @@
         <span aria-hidden="true">☰</span> Menu
       </button>
     </div>
-    <h1 class="header-center">🦞 OpenClaw Map – Community Map for Builders <span class="beta">Beta v0.5</span></h1>
+    <h1 class="header-center">🦞 OpenClaw Map<span class="hide-mobile"> – Community Map for Builders</span> <span class="beta">Beta v0.6</span></h1>
     <div class="header-right">
       <span id="auth-status"></span>
       <a href="#" id="link-create-account" class="btn" style="display:none">Create account</a>
@@ -166,7 +178,7 @@
       <h2 style="font-size:0.95rem;margin-bottom:0.5rem;color:var(--accent)">Find Lobsters Near You</h2>
       <p style="font-size:0.85rem;color:var(--text-muted);line-height:1.5;margin-bottom:0.5rem">OpenClaw Map is where human lobsters connect.</p>
       <p style="font-size:0.85rem;color:var(--text-muted);line-height:1.5;margin-bottom:0.5rem">Browse builders, meetups, and businesses on the <a href="index.html">interactive map</a>. Add yourself to find collaborators, join IRL events, or discover the local OpenClaw community.</p>
-      <p style="font-size:0.85rem;color:var(--text-muted);line-height:1.5;margin-bottom:0.75rem"><a href="about.html">Learn more</a> · <a href="index.html?filter=meetup">OpenClaw meetups</a> · <a href="builders.html">builders directory</a></p>
+      <p style="font-size:0.85rem;color:var(--text-muted);line-height:1.5;margin-bottom:0.75rem" class="intro-links"><a href="about.html">Learn more</a><span class="link-sep"> · </span><a href="index.html?filter=meetup">OpenClaw meetups</a><span class="link-sep"> · </span><a href="builders.html">builders directory</a></p>
     </div>
     <div class="filter-row">
       <button type="button" class="filter-btn active" data-filter="all">All</button>
