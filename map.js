@@ -328,6 +328,7 @@
           ${spot.event_date ? '<div style="font-size:0.8rem;color:var(--accent);margin:0.25rem 0">📅 ' + escapeHtml(new Date(spot.event_date + 'T12:00:00').toLocaleDateString()) + '</div>' : ''}
           ${spot.description ? '<p style="font-size:0.85rem;margin:0.25rem 0">' + escapeHtml(spot.description) + '</p>' : ''}
           <div class="city">📍 ${escapeHtml(spot.city)}</div>
+          ${spot.x_profile ? '<a href="' + escapeHtml(normalizeXUrl(spot.x_profile)) + '" target="_blank" rel="noopener noreferrer" style="font-size:0.8rem;color:var(--accent);display:inline-flex;align-items:center;gap:0.25rem;margin-top:0.25rem">𝕏 X Profile</a>' : ''}
           ${spot.image_url ? '<img src="' + escapeHtml(spot.image_url) + '" alt="' + escapeHtml(spot.name) + ' – OpenClaw map spot" style="max-width:100%;max-height:120px;border-radius:6px;margin-top:0.5rem" loading="lazy">' : ''}
           ${currentUser && spot.created_by === currentUser.id ? `
             <div style="margin-top:0.5rem;display:flex;gap:0.5rem">
@@ -351,6 +352,14 @@
     const div = document.createElement('div');
     div.textContent = s;
     return div.innerHTML;
+  }
+
+  function normalizeXUrl(val) {
+    if (!val || typeof val !== 'string') return '';
+    const t = val.trim().replace(/^@/, '');
+    if (!t) return '';
+    if (/^https?:\/\//i.test(t)) return t;
+    return 'https://x.com/' + t.replace(/^x\.com\/?/i, '');
   }
 
   function reverseGeocode(lat, lng) {
@@ -419,6 +428,7 @@
     const preview = document.getElementById('spot-image-preview');
     preview.innerHTML = spot?.image_url ? `<img src="${escapeHtml(spot.image_url)}" alt="" style="max-width:100%;border-radius:6px;border:1px solid rgba(255,90,45,0.2)">` : '';
     document.getElementById('spot-event-date').value = spot?.event_date || '';
+    document.getElementById('spot-x-profile').value = spot?.x_profile || '';
     document.getElementById('spot-lat').value = fromClick?.lat ?? spot?.lat ?? '';
     document.getElementById('spot-lng').value = fromClick?.lng ?? spot?.lng ?? '';
     const eventDateGroup = document.getElementById('event-date-group');
@@ -486,12 +496,14 @@
       const { data } = supabase.storage.from('spot-images').getPublicUrl(path);
       imageUrl = data.publicUrl;
     }
+    const xProfileRaw = document.getElementById('spot-x-profile').value.trim();
     const payload = {
       name: document.getElementById('spot-name').value.trim(),
       description: document.getElementById('spot-description').value.trim() || null,
       city: document.getElementById('spot-city').value.trim(),
       category,
       image_url: imageUrl,
+      x_profile: xProfileRaw ? normalizeXUrl(xProfileRaw) : null,
       event_date: category === 'meetup' ? document.getElementById('spot-event-date').value || null : null,
       lat,
       lng

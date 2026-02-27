@@ -22,7 +22,7 @@ Add spots as a guest (no signup) or sign in to create an account. Anyone can bro
 
 ### 1. Supabase
 
-1. Run the SQL in `supabase/schema.sql` in your Supabase project's SQL Editor (includes spots, help_skills, creations tables and event_date column).
+1. Run the SQL in `supabase/schema.sql` in your Supabase project's SQL Editor (includes spots, help_skills, creations tables, event_date, and x_profile columns).
 2. Create a Storage bucket named `spot-images` (Public: Yes) in Dashboard → Storage.
 3. Run `supabase/storage-policies.sql` in the SQL Editor to add upload and read policies.
 4. **Anonymous Auth**: In Supabase Dashboard → Authentication → Providers → enable **Anonymous** (allows "Add as guest" without signup).

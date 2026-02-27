@@ -64,6 +64,9 @@ CREATE POLICY "Users can delete own spots" ON spots
 -- Add event_date to spots (for meetup/events calendar)
 ALTER TABLE spots ADD COLUMN IF NOT EXISTS event_date DATE;
 
+-- Add x_profile to spots (optional X/Twitter profile URL)
+ALTER TABLE spots ADD COLUMN IF NOT EXISTS x_profile TEXT;
+
 -- Help & skills table (ask for help, offer services, post bounties)
 CREATE TABLE IF NOT EXISTS help_skills (
   id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
