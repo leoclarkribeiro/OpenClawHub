@@ -316,7 +316,6 @@
     const xLink = xUrl ? `<a href="${escapeHtml(xUrl)}" target="_blank" rel="noopener noreferrer" class="popup-x"><svg viewBox="0 0 24 24" width="14" height="14" fill="currentColor"><path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z"/></svg>View on X</a>` : '';
     return `
       <div class="popup-content">
-        <button type="button" class="popup-close-btn" aria-label="Close">&times;</button>
         <h3>${escapeHtml(spot.name)}</h3>
         <div class="popup-meta">
           <span>${CATEGORIES[spot.category]?.icon || '📍'} ${CATEGORIES[spot.category]?.label || spot.category}</span>
@@ -344,6 +343,26 @@
     if (sharedInfoWindow) sharedInfoWindow.close();
     sharedInfoWindow = null;
     sharedInfoWindow = new google.maps.InfoWindow();
+    google.maps.event.addListener(sharedInfoWindow, 'domready', () => {
+      setTimeout(() => {
+        const closeBtn = document.querySelector('button[aria-label="Close"], .gm-style-iw + button, .gm-style-iw ~ button');
+        const closeDiv = document.querySelector('.gm-style-iw + div');
+        const target = closeBtn || closeDiv;
+        if (target) {
+          target.style.setProperty('filter', 'invert(1) sepia(1) saturate(5) hue-rotate(5deg)', 'important');
+          target.style.setProperty('background', 'transparent', 'important');
+          target.style.setProperty('width', '22px', 'important');
+          target.style.setProperty('height', '22px', 'important');
+          target.style.setProperty('min-width', '22px', 'important');
+          target.style.setProperty('min-height', '22px', 'important');
+        }
+        document.querySelectorAll('.gm-style-iw + button img, .gm-style-iw + div img, .gm-style-iw ~ button img').forEach(img => {
+          img.style.setProperty('filter', 'invert(1) sepia(1) saturate(5) hue-rotate(5deg)', 'important');
+          img.style.setProperty('width', '14px', 'important');
+          img.style.setProperty('height', '14px', 'important');
+        });
+      }, 50);
+    });
     const filtered = currentFilter === 'all' ? spots : spots.filter(s => s.category === currentFilter);
     filtered.forEach(spot => {
       const marker = new google.maps.Marker({
@@ -539,10 +558,6 @@
   });
 
   document.body.addEventListener('click', (e) => {
-    if (e.target.closest('.popup-close-btn')) {
-      sharedInfoWindow?.close();
-      return;
-    }
     const editBtn = e.target.closest('.btn-edit[data-id]');
     if (editBtn) {
       const spot = spots.find(s => s.id === editBtn.dataset.id);
