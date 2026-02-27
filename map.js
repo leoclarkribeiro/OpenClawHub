@@ -21,7 +21,7 @@
     business: { label: 'Business', icon: '💰' }
   };
 
-  let map, markers = [], currentFilter = 'all', spots = [], currentUser = null, pendingClick = null;
+  let map, markers = [], currentFilter = 'all', spots = [], currentUser = null, pendingClick = null, sharedInfoWindow = null;
 
   const params = new URLSearchParams(window.location.search);
   if (params.get('filter') === 'meetup') currentFilter = 'meetup';
@@ -301,18 +301,48 @@
           map.panTo({ lat: spot.lat, lng: spot.lng });
           map.setZoom(12);
           const m = markers.find(x => x.spot?.id === spot.id);
-          if (m?.infoWindow) m.infoWindow.open(map, m.marker);
+          if (m?.infoWindow) {
+            sharedInfoWindow.close();
+            sharedInfoWindow.setContent(buildSpotPopupContent(spot));
+            sharedInfoWindow.open(map, m.marker);
+          }
         }
       });
     });
   }
 
+  function buildSpotPopupContent(spot) {
+    const xUrl = spot.x_profile ? normalizeXUrl(spot.x_profile) : '';
+    const xLink = xUrl ? `<a href="${escapeHtml(xUrl)}" target="_blank" rel="noopener noreferrer" class="popup-x"><svg viewBox="0 0 24 24" width="14" height="14" fill="currentColor"><path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z"/></svg>View on X</a>` : '';
+    return `
+      <div class="popup-content">
+        <h3>${escapeHtml(spot.name)}</h3>
+        <div class="popup-meta">
+          <span>${CATEGORIES[spot.category]?.icon || '📍'} ${CATEGORIES[spot.category]?.label || spot.category}</span>
+          <span>📍 ${escapeHtml(spot.city)}</span>
+          ${spot.event_date ? '<span style="color:var(--accent)">📅 ' + escapeHtml(new Date(spot.event_date + 'T12:00:00').toLocaleDateString()) + '</span>' : ''}
+        </div>
+        ${spot.description ? '<p class="popup-desc">' + escapeHtml(spot.description) + '</p>' : ''}
+        ${spot.image_url ? '<img src="' + escapeHtml(spot.image_url) + '" alt="' + escapeHtml(spot.name) + '" class="popup-img" loading="lazy">' : ''}
+        ${xLink}
+        ${currentUser && spot.created_by === currentUser.id ? `
+          <div class="popup-actions">
+            <button class="btn-edit" data-id="${spot.id}">Edit</button>
+            <button class="btn-delete" data-id="${spot.id}">Delete</button>
+          </div>
+        ` : ''}
+      </div>
+    `;
+  }
+
   function renderMarkers() {
     markers.forEach(m => {
       if (m.marker) m.marker.setMap(null);
-      if (m.infoWindow) m.infoWindow.close();
     });
     markers = [];
+    if (sharedInfoWindow) sharedInfoWindow.close();
+    sharedInfoWindow = null;
+    sharedInfoWindow = new google.maps.InfoWindow();
     const filtered = currentFilter === 'all' ? spots : spots.filter(s => s.category === currentFilter);
     filtered.forEach(spot => {
       const marker = new google.maps.Marker({
@@ -321,33 +351,12 @@
         label: { text: CATEGORIES[spot.category]?.icon || '📍', color: '#333', fontSize: '16px' },
         icon: { path: google.maps.SymbolPath.CIRCLE, scale: 14, fillColor: '#FF5A2D', fillOpacity: 0.95, strokeColor: '#D14A22', strokeWeight: 2 }
       });
-      const xUrl = spot.x_profile ? normalizeXUrl(spot.x_profile) : '';
-      const xLink = xUrl ? `<a href="${escapeHtml(xUrl)}" target="_blank" rel="noopener noreferrer" class="popup-x"><svg viewBox="0 0 24 24" width="14" height="14" fill="currentColor"><path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z"/></svg>View on X</a>` : '';
-      const content = `
-        <div class="popup-content">
-          <h3>${escapeHtml(spot.name)}</h3>
-          <div class="popup-meta">
-            <span>${CATEGORIES[spot.category]?.icon || '📍'} ${CATEGORIES[spot.category]?.label || spot.category}</span>
-            <span>📍 ${escapeHtml(spot.city)}</span>
-            ${spot.event_date ? '<span style="color:var(--accent)">📅 ' + escapeHtml(new Date(spot.event_date + 'T12:00:00').toLocaleDateString()) + '</span>' : ''}
-          </div>
-          ${spot.description ? '<p class="popup-desc">' + escapeHtml(spot.description) + '</p>' : ''}
-          ${spot.image_url ? '<img src="' + escapeHtml(spot.image_url) + '" alt="' + escapeHtml(spot.name) + '" class="popup-img" loading="lazy">' : ''}
-          ${xLink}
-          ${currentUser && spot.created_by === currentUser.id ? `
-            <div class="popup-actions">
-              <button class="btn-edit" data-id="${spot.id}">Edit</button>
-              <button class="btn-delete" data-id="${spot.id}">Delete</button>
-            </div>
-          ` : ''}
-        </div>
-      `;
-      const infoWindow = new google.maps.InfoWindow({ content });
       marker.addListener('click', () => {
-        markers.forEach(m => m.infoWindow?.close());
-        infoWindow.open(map, marker);
+        sharedInfoWindow.close();
+        sharedInfoWindow.setContent(buildSpotPopupContent(spot));
+        sharedInfoWindow.open(map, marker);
       });
-      markers.push({ spot, marker, infoWindow });
+      markers.push({ spot, marker, infoWindow: sharedInfoWindow });
     });
   }
 
@@ -481,6 +490,11 @@
 
   document.getElementById('spot-form').addEventListener('submit', async (e) => {
     e.preventDefault();
+    if (!currentUser) {
+      alert('Please sign in to save your spot.');
+      document.getElementById('auth-modal').classList.add('open');
+      return;
+    }
     const id = document.getElementById('spot-id').value;
     const lat = parseFloat(document.getElementById('spot-lat').value);
     const lng = parseFloat(document.getElementById('spot-lng').value);
