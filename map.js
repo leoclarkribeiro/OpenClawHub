@@ -321,17 +321,21 @@
         label: { text: CATEGORIES[spot.category]?.icon || '📍', color: '#333', fontSize: '16px' },
         icon: { path: google.maps.SymbolPath.CIRCLE, scale: 14, fillColor: '#FF5A2D', fillOpacity: 0.95, strokeColor: '#D14A22', strokeWeight: 2 }
       });
+      const xUrl = spot.x_profile ? normalizeXUrl(spot.x_profile) : '';
+      const xLink = xUrl ? `<a href="${escapeHtml(xUrl)}" target="_blank" rel="noopener noreferrer" class="popup-x"><svg viewBox="0 0 24 24" width="14" height="14" fill="currentColor"><path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z"/></svg>View on X</a>` : '';
       const content = `
         <div class="popup-content">
           <h3>${escapeHtml(spot.name)}</h3>
-          <div class="category">${CATEGORIES[spot.category]?.icon || ''} ${CATEGORIES[spot.category]?.label || spot.category}</div>
-          ${spot.event_date ? '<div style="font-size:0.8rem;color:var(--accent);margin:0.25rem 0">📅 ' + escapeHtml(new Date(spot.event_date + 'T12:00:00').toLocaleDateString()) + '</div>' : ''}
-          ${spot.description ? '<p style="font-size:0.85rem;margin:0.25rem 0">' + escapeHtml(spot.description) + '</p>' : ''}
-          <div class="city">📍 ${escapeHtml(spot.city)}</div>
-          ${spot.x_profile ? '<a href="' + escapeHtml(normalizeXUrl(spot.x_profile)) + '" target="_blank" rel="noopener noreferrer" style="font-size:0.8rem;color:var(--accent);display:inline-flex;align-items:center;gap:0.25rem;margin-top:0.25rem">𝕏 X Profile</a>' : ''}
-          ${spot.image_url ? '<img src="' + escapeHtml(spot.image_url) + '" alt="' + escapeHtml(spot.name) + ' – OpenClaw map spot" style="max-width:100%;max-height:120px;border-radius:6px;margin-top:0.5rem" loading="lazy">' : ''}
+          <div class="popup-meta">
+            <span>${CATEGORIES[spot.category]?.icon || '📍'} ${CATEGORIES[spot.category]?.label || spot.category}</span>
+            <span>📍 ${escapeHtml(spot.city)}</span>
+            ${spot.event_date ? '<span style="color:var(--accent)">📅 ' + escapeHtml(new Date(spot.event_date + 'T12:00:00').toLocaleDateString()) + '</span>' : ''}
+          </div>
+          ${spot.description ? '<p class="popup-desc">' + escapeHtml(spot.description) + '</p>' : ''}
+          ${spot.image_url ? '<img src="' + escapeHtml(spot.image_url) + '" alt="' + escapeHtml(spot.name) + '" class="popup-img" loading="lazy">' : ''}
+          ${xLink}
           ${currentUser && spot.created_by === currentUser.id ? `
-            <div style="margin-top:0.5rem;display:flex;gap:0.5rem">
+            <div class="popup-actions">
               <button class="btn-edit" data-id="${spot.id}">Edit</button>
               <button class="btn-delete" data-id="${spot.id}">Delete</button>
             </div>
