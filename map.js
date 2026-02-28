@@ -346,6 +346,10 @@
     if (sharedInfoWindow) sharedInfoWindow.close();
     sharedInfoWindow = null;
     sharedInfoWindow = new google.maps.InfoWindow();
+    google.maps.event.addListener(sharedInfoWindow, 'domready', () => {
+      const gClose = document.querySelector('.gm-style-iw + button, button[aria-label="Close"]');
+      if (gClose) gClose.style.display = 'none';
+    });
     const filtered = currentFilter === 'all' ? spots : spots.filter(s => s.category === currentFilter);
     filtered.forEach(spot => {
       const marker = new google.maps.Marker({
