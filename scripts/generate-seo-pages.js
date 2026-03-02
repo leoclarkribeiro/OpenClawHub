@@ -62,7 +62,7 @@ const PAGE_TEMPLATE = (opts) => `<!DOCTYPE html>
   <meta name="description" content="${escapeHtml(opts.description)}">
   <link rel="canonical" href="${escapeHtml(opts.canonicalUrl || BASE_URL + '/')}">
   ${opts.schemaScript || ''}
-  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🦞</text></svg>">
+  <link rel="icon" href="${(opts.basePath || '')}assets/lobster.png" type="image/png">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;600&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
