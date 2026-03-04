@@ -86,7 +86,7 @@
 
   function initMap() {
     const mapEl = document.getElementById('map');
-    mapEl.innerHTML = '<div id="map-canvas"></div><div class="map-search-container"><input type="text" id="map-search" class="map-search-input" placeholder="Search city or place..." autocomplete="off" aria-label="Search for a city or place"></div>';
+    mapEl.innerHTML = '<div id="map-canvas"></div><div class="map-search-container"><div class="map-search-wrapper"><input type="text" id="map-search" class="map-search-input" placeholder="Search city or place..." autocomplete="off" aria-label="Search for a city or place"><button type="button" class="map-search-clear" id="map-search-clear" aria-label="Clear search" title="Clear">×</button></div></div>';
     const mapCanvas = document.getElementById('map-canvas');
     map = new google.maps.Map(mapCanvas, {
       center: { lat: 20, lng: 0 },
@@ -102,6 +102,11 @@
     });
 
     initSearchAutocomplete();
+    const searchInput = document.getElementById('map-search');
+    const searchClear = document.getElementById('map-search-clear');
+    if (searchClear && searchInput) {
+      searchClear.addEventListener('click', () => { searchInput.value = ''; searchInput.focus(); });
+    }
 
     map.addListener('click', async (e) => {
       if (!e.placeId && currentUser) {
