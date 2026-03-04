@@ -486,7 +486,7 @@
     document.getElementById('spot-name').value = spot?.name || '';
     document.getElementById('spot-description').value = spot?.description || '';
     document.getElementById('spot-city').value = (fromClick?.city ?? spot?.city) || '';
-    document.getElementById('spot-category').value = spot?.category || 'lobster';
+    document.getElementById('spot-category').value = spot?.category || fromClick?.category || 'meetup';
     document.getElementById('spot-image').value = '';
     document.getElementById('spot-image').dataset.existingUrl = spot?.image_url || '';
     document.getElementById('spot-image').dataset.removeImage = '';
@@ -497,7 +497,7 @@
     document.getElementById('spot-lat').value = fromClick?.lat ?? spot?.lat ?? '';
     document.getElementById('spot-lng').value = fromClick?.lng ?? spot?.lng ?? '';
     const eventDateGroup = document.getElementById('event-date-group');
-    eventDateGroup.style.display = (spot?.category || fromClick?.category || 'lobster') === 'meetup' ? 'block' : 'none';
+    eventDateGroup.style.display = (spot?.category || fromClick?.category || 'meetup') === 'meetup' ? 'block' : 'none';
     const removeBtn = document.getElementById('spot-image-remove');
     removeBtn.style.display = spot?.image_url ? 'inline-block' : 'none';
     modal.classList.add('open');
