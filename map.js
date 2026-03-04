@@ -17,7 +17,7 @@
 
   const CATEGORIES = {
     lobster: { label: 'Human Lobster / Builder', icon: '🦞' },
-    meetup: { label: 'Meetup & IRL Event', icon: '🏠' },
+    meetup: { label: 'Meetup & IRL Event', icon: '🚀' },
     business: { label: 'Business', icon: '💰' }
   };
 

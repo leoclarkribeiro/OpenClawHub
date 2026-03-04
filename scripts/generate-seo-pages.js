@@ -16,7 +16,7 @@ const supabaseAnonKey = process.env.VITE_SUPABASE_ANON_KEY || process.env.SUPABA
 
 const CATEGORIES = {
   lobster: { label: 'Human Lobster / Builder', icon: '🦞', slug: 'builders' },
-  meetup: { label: 'Meetup & IRL Event', icon: '🏠', slug: 'meetups' },
+  meetup: { label: 'Meetup & IRL Event', icon: '🚀', slug: 'meetups' },
   business: { label: 'Business', icon: '💰', slug: 'businesses' }
 };
 
@@ -189,7 +189,7 @@ async function main() {
       content += `<h2>🦞 Human Lobsters / Builders</h2><ul class="spot-list">${lobsterSpots.map(s => renderSpotItem(s, bp)).join('')}</ul>`;
     }
     if (meetupSpots.length) {
-      content += `<h2>🏠 Meetups & IRL Events</h2><ul class="spot-list">${meetupSpots.map(s => renderSpotItem(s, bp)).join('')}</ul>`;
+      content += `<h2>🚀 Meetups & IRL Events</h2><ul class="spot-list">${meetupSpots.map(s => renderSpotItem(s, bp)).join('')}</ul>`;
     }
     if (businessSpots.length) {
       content += `<h2>💰 Businesses</h2><ul class="spot-list">${businessSpots.map(s => renderSpotItem(s, bp)).join('')}</ul>`;
