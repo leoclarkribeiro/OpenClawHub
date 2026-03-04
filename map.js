@@ -44,7 +44,7 @@
         showMapError('Google Maps API key invalid or restricted. Check: 1) Billing enabled in Google Cloud, 2) Maps JavaScript API enabled, 3) Key restrictions allow this site (e.g. *.vercel.app, your domain).');
       };
       const script = document.createElement('script');
-      script.src = `https://maps.googleapis.com/maps/api/js?key=${encodeURIComponent(googleMapsKey)}&callback=_openclawMapsReady&loading=async`;
+      script.src = `https://maps.googleapis.com/maps/api/js?key=${encodeURIComponent(googleMapsKey)}&libraries=places&callback=_openclawMapsReady&loading=async`;
       script.async = true;
       script.onerror = () => {
         clearTimeout(timeout);
@@ -59,10 +59,36 @@
     if (el) el.innerHTML = '<div style="padding:2rem;text-align:center;color:#e74c3c;max-width:400px;margin:2rem auto;font-size:0.9rem">' + msg + '</div>';
   }
 
+  function initSearchAutocomplete() {
+    const input = document.getElementById('map-search');
+    if (!input || !map) return;
+    const autocomplete = new google.maps.places.Autocomplete(input, {
+      types: ['(regions)']
+    });
+    autocomplete.addListener('place_changed', () => {
+      const place = autocomplete.getPlace();
+      if (place.geometry?.location) {
+        const loc = place.geometry.location;
+        map.panTo(loc);
+        map.setZoom(11);
+      } else if (place.place_id) {
+        const service = new google.maps.places.PlacesService(map);
+        service.getDetails({ placeId: place.place_id, fields: ['geometry'] }, (result, status) => {
+          if (status === google.maps.places.PlacesServiceStatus.OK && result?.geometry?.location) {
+            map.panTo(result.geometry.location);
+            map.setZoom(11);
+          }
+        });
+      }
+    });
+  }
+
+
   function initMap() {
     const mapEl = document.getElementById('map');
-    mapEl.innerHTML = '';
-    map = new google.maps.Map(mapEl, {
+    mapEl.innerHTML = '<div id="map-canvas"></div><div class="map-search-container"><input type="text" id="map-search" class="map-search-input" placeholder="Search city or place..." autocomplete="off" aria-label="Search for a city or place"></div>';
+    const mapCanvas = document.getElementById('map-canvas');
+    map = new google.maps.Map(mapCanvas, {
       center: { lat: 20, lng: 0 },
       zoom: 2,
       mapTypeId: 'terrain',
@@ -74,6 +100,8 @@
     window.addEventListener('resize', () => {
       if (map) google.maps.event.trigger(map, 'resize');
     });
+
+    initSearchAutocomplete();
 
     map.addListener('click', async (e) => {
       if (!e.placeId && currentUser) {
