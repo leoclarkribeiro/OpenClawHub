@@ -155,7 +155,7 @@
       linkCreate.style.display = 'none';
       btnAuth.textContent = 'Sign in';
       btnAuth.style.display = 'inline-block';
-      btnAdd.style.display = 'none';
+      btnAdd.style.display = 'inline-block';
     }
   }
 
@@ -454,17 +454,29 @@
   });
 
   // Add spot button
-  document.getElementById('btn-add').addEventListener('click', () => {
-    if (!currentUser) {
-      document.getElementById('auth-modal').classList.add('open');
+  document.getElementById('btn-add').addEventListener('click', async () => {
+    const zoom = map?.getZoom?.() ?? 2;
+    const center = map?.getCenter?.();
+    if (zoom < 9 || !center) {
+      const hint = document.createElement('div');
+      hint.id = 'add-hint';
+      hint.style.cssText = 'position:fixed;bottom:1rem;left:50%;transform:translateX(-50%);background:var(--bg-card);border:1px solid rgba(255,90,45,0.3);padding:0.5rem 1rem;border-radius:8px;font-size:0.85rem;z-index:1500';
+      hint.textContent = 'Zoom in to a city first, or search for a city';
+      document.body.appendChild(hint);
+      setTimeout(() => hint.remove(), 3500);
       return;
     }
-    const hint = document.createElement('div');
-    hint.id = 'add-hint';
-    hint.style.cssText = 'position:fixed;bottom:1rem;left:50%;transform:translateX(-50%);background:var(--bg-card);border:1px solid rgba(255,90,45,0.3);padding:0.5rem 1rem;border-radius:8px;font-size:0.85rem;z-index:1500';
-    hint.textContent = 'Click on the map to add a spot';
-    document.body.appendChild(hint);
-    setTimeout(() => hint.remove(), 3000);
+    const lat = center.lat();
+    const lng = center.lng();
+    const city = await reverseGeocode(lat, lng);
+    if (currentUser) {
+      openSpotModal(null, { lat, lng, city });
+    } else {
+      pendingClick = { lat, lng, city };
+      document.getElementById('auth-section').style.display = 'none';
+      document.getElementById('auth-error').textContent = '';
+      document.getElementById('auth-modal').classList.add('open');
+    }
   });
 
   function openSpotModal(spot, fromClick) {
